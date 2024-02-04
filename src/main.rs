@@ -1,6 +1,11 @@
 mod dsp;
 mod system;
 
+mod engine;
+
 fn main() {
-    println!("Hello, world!");
+    // Start the audio thread
+    let audio = AudioEngineManager::new();
+
+    // Start the midi thread
 }
