@@ -1,7 +1,9 @@
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub enum ParameterID {
+    #[default]
     ADSR1Attack,
     ADSR1Decay,
     ADSR1Sustain,
@@ -86,9 +88,11 @@ pub enum ParameterID {
     INSTRUMENTMaster
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Parameter {
     id: ParameterID,
+    module_id: Uuid,
+    midi_id: u8,
     voice_id: usize,
     value: f32,
     base_value: f32,
@@ -97,8 +101,55 @@ pub struct Parameter {
 }
 
 impl Parameter {
+    pub fn from_id(id: ParameterID, module_id: Uuid, voice_id: usize, sample_rate: f32) -> Self {
+        let ms = sample_rate / 1000.0;
+        match id {
+            ParameterID::WS1Detune => Self::new(id, module_id, voice_id, 440.0, 440.0, (350.0, 500.0)),
+            ParameterID::WS1Harmonics => Self::new(id, module_id, voice_id, 0.0, 0.0, (-1.0, 1.0)),
+            ParameterID::WT1Shape => Self::new(id, module_id, voice_id, 0.0, 0.0, (0.0, 1.0)),
+            ParameterID::WT1Detune => Self::new(id, module_id, voice_id, 440.0, 440.0, (350.0, 500.0)),
+            ParameterID::WT1Transpose => Self::new(id, module_id, voice_id, 0.0, 0.0, (-12.0, 12.0)),
+            
+            ParameterID::ADSR1Attack => Self::new(id, module_id, voice_id, 20.0*ms, 20.0*ms, (0.1*ms, 1000.0*ms)),
+            ParameterID::ADSR1Decay => Self::new(id, module_id, voice_id, 20.0*ms, 20.0*ms, (0.1*ms, 1000.0*ms)),
+            ParameterID::ADSR1Sustain => Self::new(id, module_id, voice_id, 0.8, 0.8, (0.0, 1.0)),
+            ParameterID::ADSR1Release => Self::new(id, module_id, voice_id, 100.0*ms, 100.0*ms, (0.1*ms, 1000.0*ms)),
+            
+            _ => panic!("no parameter with that id")
+        }
+    }
+    
+    pub fn new(id: ParameterID, module_id: Uuid, voice_id: usize, value: f32, base_value: f32, range: (f32, f32)) -> Self {
+        Self {
+            id,
+            module_id,
+            value,
+            base_value,
+            midi_id: 0,
+            voice_id,
+            min: range.0,
+            max: range.1
+        }
+    }
+
+    pub fn accepts(&self, id: &ParameterID) -> bool {
+        id.eq(&self.id)
+    }
+
+    pub fn accepts_cc(&self, cc: u8) -> bool {
+        cc.eq(&self.midi_id)
+    }
+    
+    pub fn assign_cc(&mut self, cc: u8) {
+        self.midi_id = cc;
+    }
+    
     pub fn get_value(&self) -> f32 {
         self.value
+    }
+    
+    pub fn set_value(&mut self, value: f32) {
+        self.value = (value * (self.max - self.min)) + self.min;
     }
 }
 
@@ -108,4 +159,3 @@ pub struct ParameterPreset {
     voice_id: usize,
     value: f32
 }
-

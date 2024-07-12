@@ -1,9 +1,13 @@
-use std::sync::mpsc::{Receiver, Sender};
-use cpal::traits::{DeviceTrait, HostTrait};
+use std::sync::{Arc, Mutex};
+use std::sync::mpsc::{channel, Receiver, Sender};
+use cpal::BufferSize::Fixed;
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use crate::engine::midi::{MidiInputHandler, MidiMessage};
+use crate::engine::synthesis::Synth;
 
 pub enum AudioEngineControlPacket {
     NoteOn(u8, u8),
-    NotOff(u8),
+    NoteOff(u8),
     SetParameter(String, f32)
 }
 
@@ -11,7 +15,7 @@ pub enum AudioEngineFeedbackPacket {
 
 }
 
-pub struct AudioEngineManager {
+pub struct EngineManager {
     pub host: cpal::Host,
     pub device: cpal::Device,
     pub config: cpal::StreamConfig,
@@ -21,30 +25,39 @@ pub struct AudioEngineManager {
     pub from_engine: Receiver<AudioEngineFeedbackPacket>
 }
 
-impl AudioEngineManager {
-    pub fn new() -> AudioEngineManager {
+impl EngineManager {
+    pub fn new() -> EngineManager {
         // Initialize cpal
+        let (from_engine_tx, from_engine_rx) = channel();
+        let (to_engine_tx, to_engine_rx) = channel();
+
         let host = cpal::default_host();
-        let device = host.default_output_device().expect("no output device available");
-        let config = device.default_output_config().expect("no default output config available");
+        let device = host.default_output_device().expect("Failed to find a default output device");
 
-        // Create the audio engine
-        let (to_engine_tx, to_engine_rx) = std::sync::mpsc::channel();
-        let (from_engine_tx, from_engine_rx) = std::sync::mpsc::channel();
+        println!("{}", host.id().name());
+        println!("device: {}", device.name().unwrap());
 
-        let mut engine = AudioEngine {
-            incoming: to_engine_rx,
-            outgoing: from_engine_tx
+        let err_fn = |err| eprintln!("an error occurred on the output audio stream: {}", err);
+        let config = device.default_output_config().unwrap().config();
+
+        let sr = config.sample_rate.0 as f32;
+        let buffer_size = match config.buffer_size {
+            Fixed(size) => size as usize,
+            _ => 512,
         };
 
-        // Create the audio stream
-        let stream = device.build_output_stream(&config.into(), move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
-            engine.process(data);
-        }, move |err| {
-            eprintln!("an error occurred on stream: {}", err);
-        }, None).expect("failed to build output stream");
+        let cb = Arc::new(Mutex::new(AudioEngine::new(to_engine_rx, from_engine_tx, sr, buffer_size)));
 
-        AudioEngineManager {
+        let stream = device.build_output_stream(&config, {
+            let _cb = cb.clone();
+            move |output: &mut [f32], info: &cpal::OutputCallbackInfo| {
+                _cb.lock().unwrap().process(output, info);
+            }
+        }, err_fn, None).unwrap();
+
+        stream.play().unwrap();
+
+        EngineManager {
             host,
             device,
             config,
@@ -58,17 +71,63 @@ impl AudioEngineManager {
 
 pub struct AudioEngine {
     pub incoming: Receiver<AudioEngineControlPacket>,
-    pub outgoing: Sender<AudioEngineFeedbackPacket>
+    pub outgoing: Sender<AudioEngineFeedbackPacket>,
+    pub is_playing: bool,
+    pub sample_position: usize,
+
+    synth: Synth,
+    midi: MidiInputHandler,
+
+    pub sample_rate: f32,
+    pub buffer_size: usize
 }
 
 impl AudioEngine {
-    pub fn new() -> AudioEngine {
+    pub fn new(incoming: Receiver<AudioEngineControlPacket>, outgoing: Sender<AudioEngineFeedbackPacket>, sr: f32, bs: usize) -> AudioEngine {
+        AudioEngine {
+            incoming,
+            outgoing,
+            sample_position: 0,
+            is_playing: false,
 
+            synth: Synth::new(sr, bs),
+            midi: MidiInputHandler::init().unwrap(),
 
-        AudioEngine {}
+            sample_rate: sr,
+            buffer_size: bs
+        }
     }
 
-    pub fn process(&mut self, data: &mut [f32]) {
+    pub fn process(&mut self, data: &mut [f32], info: &cpal::OutputCallbackInfo) {
+        self.synth.set_block_size(data.len());
+        self.buffer_size = data.len();
+        
+        let messages = self.midi.run();
 
+        for message in messages {
+            match message {
+                MidiMessage::NoteOn(note, velocity) => {
+                    self.synth.note_on(note, velocity);
+                },
+                MidiMessage::NoteOff(note, _) => {
+                    self.synth.note_off(note);
+                },
+                MidiMessage::MidiCC(cc, value) => {
+                    println!("Received midi CC message: {:?}", message);
+                    self.synth.handle_cc(cc, value);
+                },
+                _ => {
+                    println!("Unhandled message: {:?}", message);
+                }
+            }
+        }
+
+        let output = self.synth.process();
+
+        for i in 0..self.buffer_size {
+            data[i] = output[i];
+        }
+
+        self.sample_position += self.buffer_size;
     }
 }
