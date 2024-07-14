@@ -56,6 +56,16 @@ impl Biquad {
 
         b
     }
+    
+    pub fn lowpass(sample_rate: f32, cutoff: f32) -> Self {
+        Self::new(cutoff, 0.707, 1.0, sample_rate, BiquadShape::Lowpass)
+    }
+    pub fn highpass(sample_rate: f32, cutoff: f32) -> Self {
+        Self::new(cutoff, 0.707, 1.0, sample_rate, BiquadShape::Highpass)
+    }
+    pub fn bandpass(sample_rate: f32, cutoff: f32) -> Self {
+        Self::new(cutoff, 0.707, 1.0, sample_rate, BiquadShape::Bandpass)
+    }
 
     pub fn set_cutoff(&mut self, cutoff: f32) {
         self.cutoff = cutoff;
@@ -79,12 +89,27 @@ impl Biquad {
     }
 
     pub fn process(&mut self, input: f32) -> f32 {
-        self.c.b0 * input +
+        let y = self.c.b0 * input +
             self.c.b1 * self.x1 +
             self.c.b2 * self.x2 -
             self.c.a1 * self.y1 -
-            self.c.a2 * self.y2
+            self.c.a2 * self.y2;
+        
+        self.x2 = self.x1;
+        self.x1 = input;
+        self.y2 = self.y1;
+        self.y1 = y;
+        
+        y
     }
+    pub fn process_out_of_place(&mut self, input: &Buffer, output: &Buffer) -> f32 {
+        self.c.b0 * input.read() +
+            self.c.b1 * input.read_back(1).unwrap() +
+            self.c.b2 * input.read_back(2).unwrap() -
+            self.c.a1 * output.read_back(1).unwrap() -
+            self.c.a2 * output.read_back(2).unwrap()
+    }
+    
     pub fn reset(&mut self) {
         self.x1 = 0.0;
         self.x2 = 0.0;

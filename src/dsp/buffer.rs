@@ -1,5 +1,5 @@
 use std::{ops::Index, sync::Arc};
-use std::ops::{Add, AddAssign, Div, IndexMut, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, IndexMut, Mul, MulAssign, Rem, Sub, SubAssign};
 use std::path::Path;
 use std::slice::SliceIndex;
 use anyhow::{Result, Context};
@@ -36,7 +36,8 @@ impl Buffer {
     }
 
     pub fn write_ahead(&mut self, value: f32, places: isize) {
-        self.data[(self.position as isize + places) as usize] = value;
+        let p = self.wrap_around(self.position as i64 + places as i64);
+        self.data[p] = value;
     }
 
     pub fn write_addition(&mut self, value: f32) {
@@ -91,18 +92,27 @@ impl Buffer {
         Ok(self.get_current_sample() * self.multiplier.clone().context("No multiplier attached")?.get_value())
     }
     pub fn read_ahead(&self, places: usize) -> Result<f32> {
-        Ok(self.data[self.position + places])
+        Ok(self.data[self.wrap_around(self.position as i64 + places as i64)])
     }
     pub fn read_back(&self, places: usize) -> Result<f32> {
-        Ok(self.data[self.position - places])
+        Ok(self.data[self.wrap_around(self.position as i64 - places as i64)])
     }
 
     pub fn get_multiplier(&self) -> Result<f32> {
         Ok(self.multiplier.clone().context("No multiplier attached")?.get_value())
     }
 
-    fn wrap_around(&self, index: usize) -> usize {
-        index % self.size
+    fn wrap_around(&self, index: i64) -> usize {
+        if index > 0 {
+            index.rem(self.size as i64) as usize
+        } else {
+            let mut i = index;
+            while i < 0 {
+                i += self.size as i64;
+            }
+
+            i as usize
+        }
     }
 
     pub fn as_vec(&self) -> Vec<f32> {
@@ -141,6 +151,16 @@ impl Buffer {
         let data: Vec<f32> = data.split(',').map(|s| s.parse().unwrap()).collect();
 
         Ok(Self::from_vec(data))
+    }
+    
+    pub fn get_average(&self) -> f32 {
+        let mut sum = 0.0;
+        for i in 0..self.size {
+            sum += self.data[i];
+        }
+
+        sum / self.size as f32
+    
     }
 }
 
@@ -200,7 +220,7 @@ impl Index<usize> for Buffer {
     type Output = f32;
 
     fn index(&self, index: usize) -> &Self::Output {
-        &self.data[self.wrap_around(index)]
+        &self.data[self.wrap_around(index as i64)]
     }
 }
 impl IndexMut<usize> for Buffer {

@@ -12,6 +12,7 @@ pub struct Synth {
     pub block_size: usize,
 
     voices_in_use: usize,
+    next_voice: usize,
     sustained_notes: Vec<u8>,
     sustain: bool,
     mix: AddAndDivide
@@ -34,6 +35,7 @@ impl Synth {
             sample_rate,
             block_size,
             voices_in_use: 0,
+            next_voice: 0,
             sustained_notes: vec![],
             sustain: false,
             mix: AddAndDivide::new()
@@ -51,14 +53,20 @@ impl Synth {
 
     pub fn note_on(&mut self, midi_note: u8, velocity: u8) {
         let mut found = false;
-        for voice in &mut self.voices {
-            if !voice.is_busy() {
-                voice.note_on(midi_note, velocity);
-
+        let old_idx = self.next_voice;
+        
+        while old_idx != (self.next_voice+1 % VOICES) {
+            if self.voices[self.next_voice].get_midi_note() == midi_note {
+                self.voices[self.next_voice].note_off();
+            }
+            if !self.voices[self.next_voice].is_busy() {
+                self.voices[self.next_voice].note_on(midi_note, velocity);
                 self.voices_in_use += 1;
                 found = true;
                 break;
             }
+            
+            self.next_voice = (self.next_voice + 1) % VOICES;
         }
 
         if !found {

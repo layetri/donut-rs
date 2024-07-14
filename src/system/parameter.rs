@@ -115,6 +115,13 @@ impl Parameter {
             ParameterID::ADSR1Sustain => Self::new(id, module_id, voice_id, 0.8, 0.8, (0.0, 1.0)),
             ParameterID::ADSR1Release => Self::new(id, module_id, voice_id, 100.0*ms, 100.0*ms, (0.1*ms, 1000.0*ms)),
             
+            ParameterID::KSCutoff => Self::new(id, module_id, voice_id, 10_000.0, 10_000.0, (1.0, 16_000.0)),
+            ParameterID::KSFeedback => Self::new(id, module_id, voice_id, 0.9999, 0.9999, (0.1, 0.99999999)),
+            
+            ParameterID::WT1Amount => Self::new(id, module_id, voice_id, 0.0, 0.0, (0.0, 1.0)),
+            ParameterID::WS1Amount => Self::new(id, module_id, voice_id, 0.0, 0.0, (0.0, 1.0)),
+            ParameterID::KSAmount => Self::new(id, module_id, voice_id, 1.0, 1.0, (0.0, 1.0)),
+            
             _ => panic!("no parameter with that id")
         }
     }

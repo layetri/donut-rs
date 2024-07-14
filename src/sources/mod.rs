@@ -8,7 +8,9 @@ use crate::system::parameter::Parameter;
 pub mod sine;
 pub mod wavetable;
 pub mod waveshaper;
-mod tensions;
+pub mod tensions;
+pub mod granular;
+
 
 pub trait AudioSource {
     fn get_id(&self) -> Uuid;

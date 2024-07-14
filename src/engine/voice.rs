@@ -1,13 +1,16 @@
 use std::time::Instant;
 use smallvec::{SmallVec, smallvec};
+use uuid::Uuid;
 use crate::dsp::biquad::{Biquad, BiquadShape};
 use crate::dsp::buffer::Buffer;
 use crate::modulators::adsr::ADSR;
 use crate::modulators::Modulator;
 use crate::sources::AudioSource;
+use crate::sources::tensions::Tensions;
 use crate::sources::waveshaper::WaveShaper;
 use crate::sources::wavetable::WaveTable;
 use crate::system::parameter::Parameter;
+use crate::system::parameter::ParameterID::{KSAmount, WS1Amount, WT1Amount};
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct VoiceData {
@@ -16,6 +19,8 @@ pub struct VoiceData {
 }
 
 pub struct Voice {
+    module_id: Uuid,
+
     // modulators: Vec<Box<dyn ModulationSource>>,
     sources: Vec<Box<dyn AudioSource + Send + Sync>>,
     effects: Vec<Box<dyn Modulator + Send + Sync>>,
@@ -23,6 +28,8 @@ pub struct Voice {
     envelope: ADSR,
     id: usize,
     data: VoiceData,
+
+    levels: SmallVec<[Parameter; 16]>,
 
     midi_note: u8,
     is_busy: bool,
@@ -33,16 +40,33 @@ impl Voice {
     pub fn new(id: usize, data: VoiceData) -> Self {
         println!("Creating voice {} with sr {}, buffer size {}", id, data.sample_rate, data.block_size);
 
+        let module_id = Uuid::new_v4();
+
         let sources: Vec<Box<dyn AudioSource + Send + Sync>> = vec![
             Box::new(WaveShaper::new(data.sample_rate, data.block_size, id)),
+            Box::new(Tensions::new(data.sample_rate, data.block_size, id)),
             Box::new(WaveTable::new(data.sample_rate, data.block_size, id))
         ];
 
+        let mut levels: SmallVec<[Parameter; 16]> = smallvec![
+            Parameter::from_id(WS1Amount, module_id, id, data.sample_rate),
+            Parameter::from_id(KSAmount, module_id, id, data.sample_rate),
+            Parameter::from_id(WT1Amount, module_id, id, data.sample_rate)
+        ];
+
+        for (i, p) in levels.iter_mut().enumerate() {
+            p.assign_cc(41 + i as u8);
+        }
+
         Voice {
+            module_id,
+
             sources,
             effects: vec![],
             lpf: Biquad::new(6000.0, 0.707, 1.0, data.sample_rate, BiquadShape::Lowpass),
             envelope: ADSR::new(data.sample_rate, data.block_size, id),
+
+            levels,
             
             id,
             data,
@@ -67,9 +91,9 @@ impl Voice {
         let mut output = Buffer::new(self.data.block_size, "Voice".to_string());
         let envelope_buffer = self.envelope.get_buffer();
 
-        for source in &mut self.sources {
+        for (i, source) in self.sources.iter_mut().enumerate() {
             let source_buffer = source.get_buffer();
-            output += envelope_buffer * source_buffer;
+            output += envelope_buffer * source_buffer * self.levels[i].get_value();
         }
         
         self.lpf.process_buffer(&mut output).unwrap();
@@ -126,6 +150,10 @@ impl Voice {
             let mut p = source.get_parameters();
             parameters.append(&mut p);
         }
+        
+        for l in self.levels.iter() {
+            parameters.push(l);
+        }
 
         let mut p = self.envelope.get_parameters();
         parameters.append(&mut p);
@@ -138,6 +166,10 @@ impl Voice {
         for source in self.sources.iter_mut() {
             let mut p = source.get_parameters_mut();
             parameters.append(&mut p);
+        }
+        
+        for l in self.levels.iter_mut() {
+            parameters.push(l);
         }
 
         let mut p = self.envelope.get_parameters_mut();

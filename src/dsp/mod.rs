@@ -4,4 +4,5 @@ pub mod filter;
 pub mod util;
 pub mod biquad;
 pub mod fft;
-mod delay_line;
+pub mod delay_line;
+pub mod filter_delay_line;
