@@ -92,7 +92,6 @@ impl AudioSource for Tensions {
             self.buffer.tick();
 
             if self.trigger_time > 0 {
-                println!("{:?} => {:?}", smp_in, smp);
                 self.trigger_time -= 1;
             } else {
                 self.dl_in.flush();

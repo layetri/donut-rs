@@ -90,7 +90,7 @@ pub enum ParameterID {
 
 #[derive(Copy, Clone, Default)]
 pub struct Parameter {
-    id: ParameterID,
+    pub(crate) id: ParameterID,
     module_id: Uuid,
     midi_id: u8,
     voice_id: usize,
@@ -101,6 +101,10 @@ pub struct Parameter {
 }
 
 impl Parameter {
+    pub fn supported() -> &'static [ParameterID] {
+        &[ParameterID::WS1Detune, ParameterID::WS1Harmonics, ParameterID::WT1Shape, ParameterID::WT1Detune, ParameterID::WT1Transpose, ParameterID::ADSR1Attack, ParameterID::ADSR1Decay, ParameterID::ADSR1Sustain, ParameterID::ADSR1Release, ParameterID::KSCutoff, ParameterID::KSFeedback]
+    }
+
     pub fn from_id(id: ParameterID, module_id: Uuid, voice_id: usize, sample_rate: f32) -> Self {
         let ms = sample_rate / 1000.0;
         match id {

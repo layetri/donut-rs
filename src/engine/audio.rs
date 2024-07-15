@@ -1,17 +1,26 @@
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use cpal::BufferSize::Fixed;
+use cpal::{Devices, InputDevices, OutputDevices};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use midir::{Ignore, MidiInput, MidiInputPorts};
+use crate::dsp::buffer::Buffer;
 use crate::engine::midi::{MidiInputHandler, MidiMessage};
 use crate::engine::synthesis::Synth;
+use crate::system::parameter::ParameterID;
 
+#[derive(Debug)]
 pub enum AudioEngineControlPacket {
-    NoteOn(u8, u8),
-    NoteOff(u8),
-    SetParameter(String, f32)
+    SetParameter(ParameterID, f32),
+
+    SetMidiInput(usize),
+    SetMidiOutput(String),
+    SetAudioInput(String),
+    SetAudioOutput(String),
 }
 
 pub enum AudioEngineFeedbackPacket {
+    Block(Buffer),
 
 }
 
@@ -20,6 +29,11 @@ pub struct EngineManager {
     pub device: cpal::Device,
     pub config: cpal::StreamConfig,
     pub stream: cpal::Stream,
+    
+    pub audio_ins: InputDevices<Devices>,
+    pub audio_outs: OutputDevices<Devices>,
+    pub midi_ins: Vec<(String, usize)>,
+    pub active_midi_in: usize,
 
     pub to_engine: Sender<AudioEngineControlPacket>,
     pub from_engine: Receiver<AudioEngineFeedbackPacket>
@@ -32,6 +46,10 @@ impl EngineManager {
         let (to_engine_tx, to_engine_rx) = channel();
 
         let host = cpal::default_host();
+        
+        let audio_ins = host.input_devices().unwrap();
+        let audio_outs = host.output_devices().unwrap();
+        
         let device = host.default_output_device().expect("Failed to find a default output device");
 
         println!("{}", host.id().name());
@@ -57,15 +75,62 @@ impl EngineManager {
 
         stream.play().unwrap();
 
-        EngineManager {
+        let mut em = EngineManager {
             host,
             device,
             config,
             stream,
+            
+            audio_ins,
+            audio_outs,
+            midi_ins: vec![],
+            active_midi_in: 0,
 
             to_engine: to_engine_tx,
             from_engine: from_engine_rx
-        }
+        };
+        
+        em.refresh_device_list();
+        
+        em
+    }
+    
+    pub fn refresh_device_list(&mut self) {
+        self.audio_ins = self.host.input_devices().unwrap();
+        self.audio_outs = self.host.output_devices().unwrap();
+
+        let mut midi_in = MidiInput::new("Donut MIDI IN").unwrap();
+        midi_in.ignore(Ignore::None);
+
+        let in_ports = midi_in.ports();
+        in_ports.iter().enumerate().for_each(|(i, port)| {
+            let name = midi_in.port_name(port).unwrap();
+            self.midi_ins.push((name, i));
+        });
+    }
+    
+    pub fn get_midi_ports(&self) -> &Vec<(String, usize)> {
+        &self.midi_ins
+    }
+    pub fn get_selected_midi_port(&self) -> usize {
+        self.active_midi_in
+    }
+    
+    pub fn get_audio_inputs(&self) -> &InputDevices<Devices> {
+        &self.audio_ins
+    }
+    
+    pub fn get_audio_outputs(&self) -> &OutputDevices<Devices> {
+        &self.audio_outs
+    }
+    
+    pub fn set_midi_device(&mut self, port: usize) {
+        self.active_midi_in = port;
+        self.to_engine.send(AudioEngineControlPacket::SetMidiInput(port)).unwrap();
+    }
+    
+    pub fn set_parameter(&mut self, id: ParameterID, value: f32) {
+        self.to_engine.send(AudioEngineControlPacket::SetParameter(id, value)).unwrap();
     }
 }
 
@@ -122,6 +187,20 @@ impl AudioEngine {
             }
         }
 
+        while let Ok(packet) = self.incoming.try_recv() {
+            match packet {
+                AudioEngineControlPacket::SetParameter(id, value) => {
+                    self.synth.set_parameter(id, value);
+                },
+                AudioEngineControlPacket::SetMidiInput(port) => {
+                    self.midi.set_input(port);
+                },
+                _ => {
+                    println!("Unhandled packet: {:?}", packet);
+                }
+            }
+        }
+
         let output = self.synth.process();
 
         for i in 0..self.buffer_size {
@@ -129,5 +208,6 @@ impl AudioEngine {
         }
 
         self.sample_position += self.buffer_size;
+        self.outgoing.send(AudioEngineFeedbackPacket::Block(output)).unwrap();
     }
 }

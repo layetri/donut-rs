@@ -6,3 +6,5 @@ pub mod biquad;
 pub mod fft;
 pub mod delay_line;
 pub mod filter_delay_line;
+pub mod comb;
+pub mod allpass;

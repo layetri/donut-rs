@@ -10,7 +10,7 @@ pub mod wavetable;
 pub mod waveshaper;
 pub mod tensions;
 pub mod granular;
-
+mod sampler;
 
 pub trait AudioSource {
     fn get_id(&self) -> Uuid;

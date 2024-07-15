@@ -3,6 +3,7 @@ use crate::dsp::add_and_divide::AddAndDivide;
 use crate::dsp::buffer::Buffer;
 use crate::engine::midi::MidiMessage;
 use crate::engine::voice::{Voice, VoiceData};
+use crate::system::parameter::ParameterID;
 
 const VOICES: usize = 12;
 
@@ -117,6 +118,19 @@ impl Synth {
             for parameter in parameters {
                 if parameter.accepts_cc(cc) {
                     parameter.set_value(value as f32 / 127.0);
+                }
+            }
+        }
+    }
+    
+    pub fn set_parameter(&mut self, parameter: ParameterID, value: f32) {
+        for voice in self.voices.iter_mut() {
+            let parameters = voice.get_parameters_mut();
+            
+            'param: for p in parameters {
+                if p.id == parameter {
+                    p.set_value(value);
+                    break 'param;
                 }
             }
         }

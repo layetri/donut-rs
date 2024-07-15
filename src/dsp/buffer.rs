@@ -1,9 +1,9 @@
 use std::{ops::Index, sync::Arc};
+use std::fmt::{Debug, Formatter};
 use std::ops::{Add, AddAssign, Div, IndexMut, Mul, MulAssign, Rem, Sub, SubAssign};
 use std::path::Path;
-use std::slice::SliceIndex;
 use anyhow::{Result, Context};
-
+use rubato::{Resampler, SincFixedIn, SincInterpolationParameters, SincInterpolationType, WindowFunction};
 use crate::system::parameter::Parameter;
 
 #[derive(Clone, Default)]
@@ -128,6 +128,71 @@ impl Buffer {
         }
     }
     
+    pub fn from_file<T: AsRef<Path>>(path: T, sample_rate: f32) -> Result<Self> {
+        let file = hound::WavReader::open(path).context("Failed to read buffer from file")?;
+        let n_channels = file.spec().channels as usize;
+        let source_sr = file.spec().sample_rate as f32;
+        let fmt = file.spec().sample_format;
+        let bits = file.spec().bits_per_sample;
+        
+        let mut data: Vec<f32> = if fmt == hound::SampleFormat::Int {
+            match bits {
+                16 => {
+                    let data: Vec<i16> = file.into_samples::<i16>().map(|s| s.unwrap()).collect();
+                    let mut f_data = vec![];
+                    for i in 0..data.len() {
+                        f_data.push(data[i] as f32 / i16::MAX as f32);
+                    }
+                    f_data
+                },
+                32 => {
+                    let data: Vec<i32> = file.into_samples::<i32>().map(|s| s.unwrap()).collect();
+                    let mut f_data = vec![];
+                    for i in 0..data.len() {
+                        f_data.push(data[i] as f32 / i32::MAX as f32);
+                    }
+                    f_data
+                },
+                _ => return Err(anyhow::anyhow!("Unsupported bit depth: {}", bits))
+            }
+        } else {
+            file.into_samples::<f32>().map(|s| s.unwrap()).collect()
+        };
+
+        if n_channels > 1 {
+            let mut mono = vec![];
+            for i in 0..data.len() / n_channels {
+                let mut sum = 0.0;
+                for j in 0..n_channels {
+                    sum += data[i * n_channels + j];
+                }
+                mono.push(sum / n_channels as f32);
+            }
+        }
+        
+        if source_sr.ne(&sample_rate) {
+            let params = SincInterpolationParameters {
+                sinc_len: 256,
+                f_cutoff: 0.95,
+                interpolation: SincInterpolationType::Linear,
+                oversampling_factor: 256,
+                window: WindowFunction::BlackmanHarris2,
+            };
+            let mut resampler = SincFixedIn::<f32>::new(
+                sample_rate as f64 / source_sr as f64,
+                2.0,
+                params,
+                data.len(),
+                1,
+            )?;
+
+            let t = resampler.process(&[data], None)?;
+            data = t[0].clone();
+        }
+
+        Ok(Self::from_vec(data))
+    }
+    
     pub fn get_between(&self, start: usize, end: usize) -> Vec<f32> {
         self.data[start..end].to_vec()
     }
@@ -162,6 +227,13 @@ impl Buffer {
         sum / self.size as f32
     
     }
+}
+
+impl Debug for Buffer {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Buffer: {} ({} samples)", self.name, self.size)
+    }
+
 }
 
 impl Add<&mut Buffer> for &Buffer {

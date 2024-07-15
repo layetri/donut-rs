@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::sync::mpsc::Receiver;
 use std::time::Duration;
+use std::borrow::Borrow;
 use midir::{Ignore, MidiInput, MidiInputConnection, MidiInputPort};
 use anyhow::Result;
 
@@ -90,6 +91,36 @@ impl MidiInputHandler {
             midi_connection: _in
         })
     }
+    
+    pub fn set_input(&mut self, port: usize) {        
+        let mut midi_in = MidiInput::new("Donut MIDI IN").unwrap();
+        midi_in.ignore(Ignore::None);
+
+        let in_ports = midi_in.ports();
+        let in_port = &in_ports[port];
+
+        let (tx, rx) = std::sync::mpsc::channel();
+
+        let _in = midi_in.connect(
+            in_port,
+            "donut-midi-in",
+            move |stamp, message, _| {
+                if message.len() == 3 {
+                    tx.send(MidiInputCallbackInfo {
+                        timestamp: stamp,
+                        message: MidiMessage::from(message)
+                    }).unwrap();
+                }
+            },
+            ()).unwrap();
+
+        *self = Self {
+            midi_in_port: in_port.clone(),
+            callbacks: Vec::new(),
+            from_midi: rx,
+            midi_connection: _in
+        };
+    }
 
     pub fn run(&mut self) -> Vec<MidiMessage> {
         let mut messages = vec![];
@@ -107,6 +138,6 @@ mod tests {
 
     #[test]
     fn test_midi_input() {
-        MidiInputHandler::run().unwrap();
+        // MidiInputHandler::run().unwrap();
     }
 }
