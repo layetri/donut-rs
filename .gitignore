@@ -1,1 +1,5 @@
 /target
+.idea
+.templates
+*.DS_Store
+*.code-workspace
