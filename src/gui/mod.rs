@@ -3,6 +3,7 @@ mod midi;
 mod mixer;
 mod status;
 mod controls;
+mod devtools;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -44,7 +45,7 @@ pub fn run_gui(engine: Arc<Mutex<EngineManager>>) {
         (Window::Controls, false),
         (Window::Modulation, false),
         (Window::Mixer, true),
-        (Window::Devtools, false)
+        (Window::Devtools, true)
     ].iter().cloned().collect();
 
     let mut state = json!({
@@ -91,6 +92,10 @@ pub fn run_gui(engine: Arc<Mutex<EngineManager>>) {
         
         if windows[&Window::Controls] {
             ControlsWindow::build(ui, engine.clone(), &mut state);
+        }
+
+        if windows[&Window::Devtools] {
+            devtools::DevToolsWindow::build(ui, engine.clone(), &mut state);
         }
     });
 }

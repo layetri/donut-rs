@@ -1,9 +1,14 @@
-use std::sync::atomic::AtomicPtr;
+use std::time::Instant;
+
 use crate::dsp::add_and_divide::AddAndDivide;
 use crate::dsp::buffer::Buffer;
-use crate::engine::midi::MidiMessage;
 use crate::engine::voice::{Voice, VoiceData};
+use crate::generators::sequencer::Sequencer;
 use crate::system::parameter::ParameterID;
+use crate::engine::clock::Clock;
+use crate::generators::Generator;
+
+use crate::system::dev::DevInfo;
 
 const VOICES: usize = 12;
 
@@ -16,7 +21,8 @@ pub struct Synth {
     next_voice: usize,
     sustained_notes: Vec<u8>,
     sustain: bool,
-    mix: AddAndDivide
+    mix: AddAndDivide,
+    clock: Clock
 }
 
 impl Synth {
@@ -39,11 +45,24 @@ impl Synth {
             next_voice: 0,
             sustained_notes: vec![],
             sustain: false,
-            mix: AddAndDivide::new()
+            mix: AddAndDivide::new(),
+            clock: Clock::new(120.0, sample_rate, block_size)
         }
     }
 
     pub fn process(&mut self) -> Buffer {
+        let _position = self.clock.tick();
+
+        let note_ons = self.clock.get_notes();
+        for note in note_ons {
+            self.note_on(note.pitch, (note.velocity * 127.0) as u8);
+        }
+
+        let note_offs = self.clock.get_note_offs();
+        for note in note_offs {
+            self.note_off(note);
+        }
+        
         let mut outputs = vec![];
         for voice in &mut self.voices {
             outputs.push(voice.process());
@@ -113,7 +132,7 @@ impl Synth {
         }
         
         for voice in self.voices.iter_mut() {
-            let mut parameters = voice.get_parameters_mut();
+            let parameters = voice.get_parameters_mut();
             
             for parameter in parameters {
                 if parameter.accepts_cc(cc) {
@@ -121,6 +140,11 @@ impl Synth {
                 }
             }
         }
+    }
+
+    pub fn toggle_playback(&mut self) -> bool {
+        self.clock.toggle_play();
+        self.clock.is_playing
     }
     
     pub fn set_parameter(&mut self, parameter: ParameterID, value: f32) {
@@ -138,6 +162,7 @@ impl Synth {
 
     pub fn set_block_size(&mut self, block_size: usize) {
         self.block_size = block_size;
+        self.clock.set_block_size(block_size);
 
         for voice in &mut self.voices {
             voice.set_block_size(block_size);

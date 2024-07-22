@@ -11,6 +11,7 @@ mod effects;
 mod modulators;
 mod gui;
 mod models;
+mod generators;
 
 fn main() {
     // Start the audio thread

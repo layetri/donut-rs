@@ -1,0 +1,41 @@
+use std::time::{Duration, Instant};
+
+#[derive(Debug, Clone)]
+pub struct DevInfo {
+    pub avg_cycle_time: Duration,
+    pub max_cycle_time: Duration,
+    pub block_size: usize,
+    pub sample_rate: f32,
+    pub allowed_cycle_time: Duration,
+    pub is_first_run: bool,
+}
+
+impl DevInfo {
+    pub fn start(block_size: usize, sample_rate: f32) -> Self {
+        DevInfo {
+            avg_cycle_time: Duration::from_secs(0),
+            max_cycle_time: Duration::from_secs(0),
+            block_size,
+            sample_rate,
+            allowed_cycle_time: Duration::from_secs(0),
+            is_first_run: true,
+        }
+    }
+
+    pub fn update(&mut self, block_size: usize, sample_rate: f32, start: Instant) {
+        if self.is_first_run {
+            self.is_first_run = false;
+            return;
+        }
+
+        let elapsed = start.elapsed();
+        self.avg_cycle_time = (self.avg_cycle_time + elapsed) / 2;
+
+        if elapsed > self.max_cycle_time {
+            self.max_cycle_time = elapsed;
+        }
+
+        self.block_size = block_size;
+        self.sample_rate = sample_rate;
+    }
+}

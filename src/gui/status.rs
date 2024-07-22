@@ -14,6 +14,11 @@ impl StatusBar {
         topbar_flags |= ImGuiWindowFlags_NoTitleBar;
         
         let flags = WindowFlags::from_bits(topbar_flags).unwrap();
+
+        let is_playing: bool;
+        {
+            is_playing = engine.lock().unwrap().get_playback_status().clone();
+        }
         
         ui.window("Application Controls")
             .flags(flags)
@@ -30,6 +35,13 @@ impl StatusBar {
                     if clicked {
                         *visible = !*visible;
                     }
+                }
+
+                ui.same_line();
+
+                let play_button = ui.button(if is_playing { "Pause" } else { "Play" });
+                if play_button {
+                    engine.lock().unwrap().toggle_playback();
                 }
             });
     }

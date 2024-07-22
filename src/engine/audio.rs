@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::time::Instant;
 use cpal::BufferSize::Fixed;
 use cpal::{Devices, InputDevices, OutputDevices};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -7,6 +8,7 @@ use midir::{Ignore, MidiInput, MidiInputPorts};
 use crate::dsp::buffer::Buffer;
 use crate::engine::midi::{MidiInputHandler, MidiMessage};
 use crate::engine::synthesis::Synth;
+use crate::system::dev::DevInfo;
 use crate::system::parameter::ParameterID;
 
 #[derive(Debug)]
@@ -17,11 +19,16 @@ pub enum AudioEngineControlPacket {
     SetMidiOutput(String),
     SetAudioInput(String),
     SetAudioOutput(String),
+
+    TogglePlayback,
+    StopPlayback,
+    ResetPlayback
 }
 
+#[derive(Debug)]
 pub enum AudioEngineFeedbackPacket {
     Block(Buffer),
-
+    DebugInfo(DevInfo)
 }
 
 pub struct EngineManager {
@@ -34,6 +41,8 @@ pub struct EngineManager {
     pub audio_outs: OutputDevices<Devices>,
     pub midi_ins: Vec<(String, usize)>,
     pub active_midi_in: usize,
+    pub playback_status: bool,
+    pub latest_debug_info: DevInfo,
 
     pub to_engine: Sender<AudioEngineControlPacket>,
     pub from_engine: Receiver<AudioEngineFeedbackPacket>
@@ -85,6 +94,8 @@ impl EngineManager {
             audio_outs,
             midi_ins: vec![],
             active_midi_in: 0,
+            playback_status: false,
+            latest_debug_info: DevInfo::start(buffer_size, sr),
 
             to_engine: to_engine_tx,
             from_engine: from_engine_rx
@@ -132,6 +143,41 @@ impl EngineManager {
     pub fn set_parameter(&mut self, id: ParameterID, value: f32) {
         self.to_engine.send(AudioEngineControlPacket::SetParameter(id, value)).unwrap();
     }
+
+    pub fn toggle_playback(&mut self) {
+        self.playback_status = !self.playback_status;
+        self.to_engine.send(AudioEngineControlPacket::TogglePlayback).unwrap();
+    }
+
+    pub fn stop_playback(&mut self) {
+        self.playback_status = false;
+        self.to_engine.send(AudioEngineControlPacket::StopPlayback).unwrap();
+    }
+
+    pub fn reset_playback(&mut self) {
+        self.to_engine.send(AudioEngineControlPacket::ResetPlayback).unwrap();
+    }
+
+    pub fn get_playback_status(&self) -> bool {
+        self.playback_status
+    }
+
+    pub fn get_latest_debug_info(&self) -> DevInfo {
+        self.latest_debug_info.clone()
+    }
+
+    pub fn run(&mut self) {
+        while let Ok(packet) = self.from_engine.try_recv() {
+            match packet {
+                AudioEngineFeedbackPacket::DebugInfo(info) => {
+                    self.latest_debug_info = info;
+                },
+                _ => {
+                    println!("Unhandled packet: {:?}", packet);
+                }
+            }
+        }
+    }
 }
 
 pub struct AudioEngine {
@@ -142,6 +188,7 @@ pub struct AudioEngine {
 
     synth: Synth,
     midi: MidiInputHandler,
+    pub dev_info: DevInfo,
 
     pub sample_rate: f32,
     pub buffer_size: usize
@@ -157,6 +204,8 @@ impl AudioEngine {
 
             synth: Synth::new(sr, bs),
             midi: MidiInputHandler::init().unwrap(),
+            dev_info: DevInfo::start(bs, sr),
+
 
             sample_rate: sr,
             buffer_size: bs
@@ -164,6 +213,8 @@ impl AudioEngine {
     }
 
     pub fn process(&mut self, data: &mut [f32], info: &cpal::OutputCallbackInfo) {
+        let start = Instant::now();
+
         self.synth.set_block_size(data.len());
         self.buffer_size = data.len();
         
@@ -195,6 +246,9 @@ impl AudioEngine {
                 AudioEngineControlPacket::SetMidiInput(port) => {
                     self.midi.set_input(port);
                 },
+                AudioEngineControlPacket::TogglePlayback => {
+                    self.synth.toggle_playback();
+                },
                 _ => {
                     println!("Unhandled packet: {:?}", packet);
                 }
@@ -209,5 +263,8 @@ impl AudioEngine {
 
         self.sample_position += self.buffer_size;
         self.outgoing.send(AudioEngineFeedbackPacket::Block(output)).unwrap();
+
+        self.dev_info.update(self.buffer_size, self.sample_rate, start);
+        self.outgoing.send(AudioEngineFeedbackPacket::DebugInfo(self.dev_info.clone())).unwrap();
     }
 }
