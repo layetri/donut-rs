@@ -4,9 +4,11 @@ use imgui::sys::{ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoMove, ImGuiWind
 use imgui::{Ui, WindowFlags};
 use crate::engine::audio::EngineManager;
 
+use super::WindowContext;
+
 pub struct StatusBar;
 impl StatusBar {
-    pub fn build(ui: &mut Ui, engine: Arc<Mutex<EngineManager>>, windows: &mut HashMap<super::Window, bool>) {
+    pub fn build(ui: &mut Ui, context: WindowContext, windows: &mut HashMap<super::Window, bool>) {
         let mut topbar_flags = 0;
         topbar_flags |= ImGuiWindowFlags_NoResize;
         topbar_flags |= ImGuiWindowFlags_NoMove;
@@ -17,7 +19,7 @@ impl StatusBar {
 
         let is_playing: bool;
         {
-            is_playing = engine.lock().unwrap().get_playback_status().clone();
+            is_playing = context.engine.lock().unwrap().get_playback_status().clone();
         }
         
         ui.window("Application Controls")
@@ -41,7 +43,7 @@ impl StatusBar {
 
                 let play_button = ui.button(if is_playing { "Pause" } else { "Play" });
                 if play_button {
-                    engine.lock().unwrap().toggle_playback();
+                    context.engine.lock().unwrap().toggle_playback();
                 }
             });
     }

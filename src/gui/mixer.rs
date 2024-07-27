@@ -4,9 +4,11 @@ use crate::engine::audio::EngineManager;
 use crate::system::parameter::Parameter;
 use crate::system::parameter::ParameterID::{KSAmount, WS1Amount, WT1Amount};
 
+use super::WindowContext;
+
 pub struct MixerWindow;
 impl MixerWindow {
-    pub fn build(ui: &Ui, engine: Arc<Mutex<EngineManager>>, state: &mut serde_json::Value) {
+    pub fn build(ui: &Ui, context: WindowContext, state: &mut serde_json::Value) {
         let params = &[WS1Amount, WT1Amount, KSAmount];
 
         ui.window("Mixer")
@@ -30,7 +32,7 @@ impl MixerWindow {
 
                         if edited {
                             state["parameters"][&n] = serde_json::Value::Number(serde_json::Number::from_f64(value).unwrap());
-                            engine.lock().unwrap().set_parameter(*p, value as f32);
+                            context.engine.lock().unwrap().set_parameter(*p, value as f32);
                         }
                     });
                     token.end();

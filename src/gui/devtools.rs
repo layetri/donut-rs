@@ -2,12 +2,14 @@ use std::sync::{Arc, Mutex};
 use imgui::{ChildWindow, Ui, VerticalSlider};
 use crate::{engine::audio::EngineManager, system::dev::DevInfo};
 
+use super::WindowContext;
+
 pub struct DevToolsWindow;
 impl DevToolsWindow {
-    pub fn build(ui: &Ui, engine: Arc<Mutex<EngineManager>>, state: &mut serde_json::Value) {
+    pub fn build(ui: &Ui, context: WindowContext, state: &mut serde_json::Value) {
         let m: DevInfo;
         {
-            let mut e = engine.lock().unwrap();
+            let mut e = context.engine.lock().unwrap();
             e.run();
             m = e.get_latest_debug_info();
         }

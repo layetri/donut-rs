@@ -2,15 +2,17 @@ use std::sync::{Arc, Mutex};
 use imgui::{Condition, ListBox, Ui};
 use crate::engine::audio::EngineManager;
 
+use super::WindowContext;
+
 pub struct MidiWindow;
 
 impl MidiWindow {
-    pub fn build(ui: &Ui, engine: Arc<Mutex<EngineManager>>) {
+    pub fn build(ui: &Ui, context: WindowContext) {
         let inputs;
         let mut midi_in_selector;
         
         {
-            let e = engine.lock().unwrap();
+            let e = context.engine.lock().unwrap();
             inputs = e.get_midi_ports().clone();
             midi_in_selector = e.get_selected_midi_port();
         }
@@ -24,7 +26,7 @@ impl MidiWindow {
                             let selected = *i == midi_in_selector;
                             if ui.selectable_config(name).selected(selected).build() {
                                 midi_in_selector = *i;
-                                engine.lock().unwrap().set_midi_device(*i);
+                                context.engine.lock().unwrap().set_midi_device(*i);
                             }
                         }
                     });

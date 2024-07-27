@@ -26,10 +26,7 @@ where
 {
     let mut imgui = create_context();
 
-    let title = match Path::new(&title).file_name() {
-        Some(file_name) => file_name.to_str().unwrap(),
-        None => title,
-    };
+    let title = "Donut 2";
     let event_loop = EventLoop::new().expect("Failed to create EventLoop");
 
     let builder = WindowBuilder::new()

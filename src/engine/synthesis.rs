@@ -1,14 +1,8 @@
-use std::time::Instant;
-
 use crate::dsp::add_and_divide::AddAndDivide;
 use crate::dsp::buffer::Buffer;
 use crate::engine::voice::{Voice, VoiceData};
-use crate::generators::sequencer::Sequencer;
 use crate::system::parameter::ParameterID;
 use crate::engine::clock::Clock;
-use crate::generators::Generator;
-
-use crate::system::dev::DevInfo;
 
 const VOICES: usize = 12;
 

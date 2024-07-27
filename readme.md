@@ -6,3 +6,6 @@ Donut is back, bigger and better than ever! I've decided to port the entire synt
 - I'm still doing the **everything synth**. Donut's 4/4/4 config will be back, featuring the 4 sound sources, 4 effects, and 4 modulators (for a start).
 - Fully modular Audio Graph. Building on the implementation from Mikoto Studio, Donut 2.0 will feature a more reliable audio processing backend (maybe).
 - User-friendly UI. I'm still on the fence about the exact framework to choose, but this iteration of Donut will finally feature a usable graphics interface (or Dear ImGui again).
+
+### Credits
+- The default piano sample was generously provided by Björn Colin.

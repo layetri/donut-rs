@@ -44,13 +44,13 @@ impl Voice {
 
         let sources: Vec<Box<dyn AudioSource + Send + Sync>> = vec![
             Box::new(WaveShaper::new(data.sample_rate, data.block_size, id)),
-            // Box::new(Tensions::new(data.sample_rate, data.block_size, id)),
+            Box::new(Tensions::new(data.sample_rate, data.block_size, id)),
             Box::new(WaveTable::new(data.sample_rate, data.block_size, id))
         ];
 
         let mut levels: SmallVec<[Parameter; 16]> = smallvec![
             Parameter::from_id(WS1Amount, module_id, id, data.sample_rate),
-            // Parameter::from_id(KSAmount, module_id, id, data.sample_rate),
+            Parameter::from_id(KSAmount, module_id, id, data.sample_rate),
             Parameter::from_id(WT1Amount, module_id, id, data.sample_rate)
         ];
 
@@ -102,7 +102,7 @@ impl Voice {
     }
 
     pub fn note_on(&mut self, midi_note: u8, velocity: u8) {
-        // println!("Voice {} received NoteOn for midi note {} with velocity {}", self.id, midi_note, velocity);
+        // println!("[{}] NoteOn: {} {}", self.id, midi_note, velocity);
 
         self.envelope.reset();
         self.envelope.start((velocity as f32 / 127.0).sqrt());
