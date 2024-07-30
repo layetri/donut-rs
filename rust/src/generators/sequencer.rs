@@ -1,0 +1,62 @@
+use smallvec::{SmallVec, smallvec};
+use super::{Generator, Note};
+
+pub struct Sequencer {
+    pub is_playing: bool,
+    pub position: usize,
+    pub index: usize,
+
+    pub pattern: Vec<Note>,
+
+    pub held_notes: SmallVec<[u8; 16]>
+}
+
+impl Sequencer {
+    pub fn new() -> Self {
+        Sequencer {
+            is_playing: false,
+            position: 0,
+            index: 0,
+            pattern: vec![
+                Note::quarter(60),
+                Note::quarter(62),
+                Note::quarter(64),
+                Note::quarter(65),
+            ],
+            held_notes: smallvec![]
+        }
+    }
+}
+
+impl Generator for Sequencer {
+    fn clear(&mut self) {
+        self.held_notes.clear();
+        self.pattern = vec![
+            Note::quarter(60),
+            Note::quarter(62),
+            Note::quarter(64),
+            Note::quarter(65),
+        ];
+    }
+
+    fn get_note_offs(&self) -> &SmallVec<[u8; 16]> {
+        &self.held_notes
+    }
+
+    fn end(&mut self) {
+        self.held_notes.push(self.pattern[self.index].pitch);
+    }
+
+    fn reset(&mut self) { self.held_notes.clear(); }
+
+    fn quarter(&mut self) -> Option<Note> {
+        // println!("Sequencer quarter note");
+
+        let old_idx = self.index;
+        self.index = (self.index + 1) % self.pattern.len();
+
+        self.held_notes.push(self.pattern[old_idx].pitch);
+
+        Some(self.pattern[self.index])
+    }
+}
