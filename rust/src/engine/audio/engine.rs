@@ -28,7 +28,7 @@ pub struct AudioEngine {
 
 impl AudioEngine {
     pub fn new(sr: f32, bs: usize, outgoing: Sender<AudioEngineFeedbackPacket>) -> AudioEngine {
-        AudioEngine {
+        let mut engine = AudioEngine {
             sample_position: 0,
             is_playing: false,
 
@@ -36,12 +36,21 @@ impl AudioEngine {
             midi: MidiInputHandler::init().unwrap(),
             dev_info: DevInfo::start(bs, sr),
 
-
             sample_rate: sr,
             buffer_size: bs,
 
             outgoing,
             i: 0
+        };
+        
+        engine.refresh();
+        
+        engine
+    }
+    
+    pub fn refresh(&mut self) {
+        if let Some(ports) = self.midi.refresh() {
+            self.outgoing.send(AudioEngineFeedbackPacket::MidiPorts(ports)).unwrap();
         }
     }
 
@@ -92,6 +101,10 @@ impl AudioEngine {
             self.i += 1;
         }
 
+        if let Some(ports) = self.midi.refresh() {
+            self.outgoing.send(AudioEngineFeedbackPacket::MidiPorts(ports)).unwrap();
+        }
+
         output
     }
 
@@ -100,7 +113,7 @@ impl AudioEngine {
             return;
         }
 
-        println!("Setting block size to: {}", block_size);
+        // println!("Setting block size to: {}", block_size);
         self.synth.set_block_size(block_size);
         self.buffer_size = block_size;
     }

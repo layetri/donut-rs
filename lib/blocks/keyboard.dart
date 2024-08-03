@@ -7,8 +7,8 @@ import 'package:donut/src/rust/frb_generated.dart';
 
 
 class KeyboardPainter extends CustomPainter {
-  int startFrom = 36;
-  int endAt = 84;
+  int startFrom = 24;
+  int endAt = 96;
 
   final List<int> activeKeys;
 

@@ -51,7 +51,11 @@ pub fn run_handler_thread(sink: StreamSink<StreamSinkPacket>) {
                         engine.toggle_playback();
                     }
                     PacketFromUI::StopPlayback() => todo!(),
-                    PacketFromUI::SetMidiDevice() => todo!(),
+                    PacketFromUI::SetMidiDevice(name) => {
+                        let devices = engine.get_midi_ports();
+                        let device_id = devices.iter().find(|(n, i)| n.eq(&name)).unwrap();
+                        engine.set_midi_device(device_id.1);
+                    },
                     PacketFromUI::SetAudioDevice() => todo!(),
                     PacketFromUI::SetParameter(id, value) => {
                         engine.set_parameter(id, value);

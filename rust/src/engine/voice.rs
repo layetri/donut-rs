@@ -41,8 +41,8 @@ impl Voice {
         let module_id = Uuid::new_v4();
 
         let sources: Vec<Box<dyn AudioSource + Send + Sync>> = vec![
-            // Box::new(WaveShaper::new(data.sample_rate, data.block_size, id)),
-            // Box::new(Tensions::new(data.sample_rate, data.block_size, id)),
+            Box::new(WaveShaper::new(data.sample_rate, data.block_size, id)),
+            Box::new(Tensions::new(data.sample_rate, data.block_size, id)),
             Box::new(WaveTable::new(data.sample_rate, data.block_size, id))
         ];
 
@@ -88,7 +88,7 @@ impl Voice {
     }
 
     pub fn note_on(&mut self, midi_note: u8, velocity: u8) {
-        // println!("[{}] NoteOn: {} {}", self.id, midi_note, velocity);
+        println!("[{}] NoteOn: {} {}", self.id, midi_note, velocity);
 
         self.envelope.reset();
         self.envelope.start((velocity as f32 / 127.0).sqrt());
@@ -105,7 +105,7 @@ impl Voice {
     }
 
     pub fn note_off(&mut self) {
-        // println!("Voice {} received NoteOff for midi note {}", self.id, self.midi_note);
+        println!("Voice {} received NoteOff for midi note {}", self.id, self.midi_note);
 
         self.envelope.stop();
         self.is_busy = false;
@@ -122,9 +122,9 @@ impl Voice {
     }
 
     pub fn set_block_size(&mut self, block_size: usize) {
-        if block_size != self.data.block_size {
-            println!("Voice {} block size changed from {} to {}", self.id, self.data.block_size, block_size);
-        }
+        // if block_size != self.data.block_size {
+        //     println!("Voice {} block size changed from {} to {}", self.id, self.data.block_size, block_size);
+        // }
         self.data.block_size = block_size;
         for source in &mut self.sources {
             source.set_block_size(block_size);

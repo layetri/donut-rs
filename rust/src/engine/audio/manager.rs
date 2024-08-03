@@ -72,6 +72,7 @@ impl EngineManager {
             loop {
                 if _packets.load(std::sync::atomic::Ordering::SeqCst) > 1 {
                     std::thread::sleep(std::time::Duration::from_micros(100));
+                    continue;
                 }
 
                 while let Ok(packet) = to_engine_rx.try_recv() {
@@ -232,7 +233,12 @@ impl EngineManager {
                 },
                 AudioEngineFeedbackPacket::Position(position) => {
                     packets.push(PacketFromEngine::Position(position));
-                }
+                },
+                AudioEngineFeedbackPacket::MidiPorts(ports) => {
+                    self.midi_ins = ports.iter().enumerate().map(|(i, port)| (port.clone(), i)).collect();
+
+                    packets.push(PacketFromEngine::MidiPorts(ports));
+                },
                 _ => {}
             }
         }

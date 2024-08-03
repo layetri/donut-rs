@@ -33,6 +33,7 @@ pub enum AudioEngineControlPacket {
 pub enum AudioEngineFeedbackPacket {
     Block(Buffer),
     DebugInfo(DevInfo),
+    MidiPorts(Vec<String>),
 
     BlockSize(usize),
     Position(usize)

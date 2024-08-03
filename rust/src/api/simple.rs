@@ -1,4 +1,5 @@
 use std::env;
+use crate::system::parameter::ParameterID;
 
 use super::commands::PacketFromUI;
 use super::ui::SENDER;
@@ -25,6 +26,18 @@ pub fn note_on(pitch: u8, velocity: f32) {
 #[flutter_rust_bridge::frb(sync)]
 pub fn note_off(pitch: u8) {
     let message = PacketFromUI::NoteOff(pitch);
+    SENDER.lock().unwrap().as_ref().unwrap().send(message).unwrap();
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn set_midi_input_port(name: String) {
+    let message = PacketFromUI::SetMidiDevice(name);
+    SENDER.lock().unwrap().as_ref().unwrap().send(message).unwrap();
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn set_parameter(id: ParameterID, value: f32) {
+    let message = PacketFromUI::SetParameter(id, value);
     SENDER.lock().unwrap().as_ref().unwrap().send(message).unwrap();
 }
 

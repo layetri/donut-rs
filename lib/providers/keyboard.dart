@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../src/rust/api/simple.dart';
+
 class KeyboardState {
   List<int> down = [];
 
@@ -14,13 +16,13 @@ class KeyboardProvider extends StateNotifier<KeyboardState> {
   void strike(int key) {
     state = KeyboardState()..down = [...state.down, key];
     
-    note_on(key);
+    noteOn(pitch: key, velocity: 1.0);
   }
 
   void lift(int key) {
     state = KeyboardState()..down = state.down.where((k) => k != key).toList();
     
-    note_off(key);
+    noteOff(pitch: key);
   }
 }
 

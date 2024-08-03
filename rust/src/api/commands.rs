@@ -8,7 +8,7 @@ pub enum PacketFromUI {
 
     StartPlayback(),
     StopPlayback(),
-    SetMidiDevice(),
+    SetMidiDevice(String),
     SetAudioDevice(),
     SetParameter(ParameterID, f32)
 }
@@ -16,7 +16,8 @@ pub enum PacketFromUI {
 pub enum PacketFromEngine {
     Position(usize),
     Buffer(Vec<f32>),
-    DebugInfo(DevInfo)
+    DebugInfo(DevInfo),
+    MidiPorts(Vec<String>)
 }
 
 impl PacketFromEngine {
@@ -24,7 +25,8 @@ impl PacketFromEngine {
         match self {
             Self::Position(..) => String::from("engine.position"),
             Self::Buffer(..) => String::from("engine.buffer"),
-            Self::DebugInfo(..) => String::from("debug")
+            Self::DebugInfo(..) => String::from("debug"),
+            Self::MidiPorts(..) => String::from("midi.ports")
         }
     }
 
@@ -34,6 +36,9 @@ impl PacketFromEngine {
                 "value": pos
             }).to_string(),
             Self::DebugInfo(info) => info.get_json(),
+            Self::MidiPorts(ports) => json!({
+                "ports": ports
+            }).to_string(),
             _ => serde_json::Value::Null.to_string()
             // Self::Buffer(buffer) => buffer.iter().map(|f| f.to_string()).collect::<Vec<String>>().join(", ")
         }

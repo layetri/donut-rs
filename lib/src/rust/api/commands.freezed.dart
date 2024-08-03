@@ -22,6 +22,7 @@ mixin _$PacketFromEngine {
     required TResult Function(BigInt field0) position,
     required TResult Function(Float32List field0) buffer,
     required TResult Function(DevInfo field0) debugInfo,
+    required TResult Function(List<String> field0) midiPorts,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -29,6 +30,7 @@ mixin _$PacketFromEngine {
     TResult? Function(BigInt field0)? position,
     TResult? Function(Float32List field0)? buffer,
     TResult? Function(DevInfo field0)? debugInfo,
+    TResult? Function(List<String> field0)? midiPorts,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -36,6 +38,7 @@ mixin _$PacketFromEngine {
     TResult Function(BigInt field0)? position,
     TResult Function(Float32List field0)? buffer,
     TResult Function(DevInfo field0)? debugInfo,
+    TResult Function(List<String> field0)? midiPorts,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -44,6 +47,7 @@ mixin _$PacketFromEngine {
     required TResult Function(PacketFromEngine_Position value) position,
     required TResult Function(PacketFromEngine_Buffer value) buffer,
     required TResult Function(PacketFromEngine_DebugInfo value) debugInfo,
+    required TResult Function(PacketFromEngine_MidiPorts value) midiPorts,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -51,6 +55,7 @@ mixin _$PacketFromEngine {
     TResult? Function(PacketFromEngine_Position value)? position,
     TResult? Function(PacketFromEngine_Buffer value)? buffer,
     TResult? Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult? Function(PacketFromEngine_MidiPorts value)? midiPorts,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -58,6 +63,7 @@ mixin _$PacketFromEngine {
     TResult Function(PacketFromEngine_Position value)? position,
     TResult Function(PacketFromEngine_Buffer value)? buffer,
     TResult Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult Function(PacketFromEngine_MidiPorts value)? midiPorts,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -152,6 +158,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     required TResult Function(BigInt field0) position,
     required TResult Function(Float32List field0) buffer,
     required TResult Function(DevInfo field0) debugInfo,
+    required TResult Function(List<String> field0) midiPorts,
   }) {
     return position(field0);
   }
@@ -162,6 +169,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     TResult? Function(BigInt field0)? position,
     TResult? Function(Float32List field0)? buffer,
     TResult? Function(DevInfo field0)? debugInfo,
+    TResult? Function(List<String> field0)? midiPorts,
   }) {
     return position?.call(field0);
   }
@@ -172,6 +180,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     TResult Function(BigInt field0)? position,
     TResult Function(Float32List field0)? buffer,
     TResult Function(DevInfo field0)? debugInfo,
+    TResult Function(List<String> field0)? midiPorts,
     required TResult orElse(),
   }) {
     if (position != null) {
@@ -186,6 +195,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     required TResult Function(PacketFromEngine_Position value) position,
     required TResult Function(PacketFromEngine_Buffer value) buffer,
     required TResult Function(PacketFromEngine_DebugInfo value) debugInfo,
+    required TResult Function(PacketFromEngine_MidiPorts value) midiPorts,
   }) {
     return position(this);
   }
@@ -196,6 +206,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     TResult? Function(PacketFromEngine_Position value)? position,
     TResult? Function(PacketFromEngine_Buffer value)? buffer,
     TResult? Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult? Function(PacketFromEngine_MidiPorts value)? midiPorts,
   }) {
     return position?.call(this);
   }
@@ -206,6 +217,7 @@ class _$PacketFromEngine_PositionImpl extends PacketFromEngine_Position {
     TResult Function(PacketFromEngine_Position value)? position,
     TResult Function(PacketFromEngine_Buffer value)? buffer,
     TResult Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult Function(PacketFromEngine_MidiPorts value)? midiPorts,
     required TResult orElse(),
   }) {
     if (position != null) {
@@ -298,6 +310,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     required TResult Function(BigInt field0) position,
     required TResult Function(Float32List field0) buffer,
     required TResult Function(DevInfo field0) debugInfo,
+    required TResult Function(List<String> field0) midiPorts,
   }) {
     return buffer(field0);
   }
@@ -308,6 +321,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     TResult? Function(BigInt field0)? position,
     TResult? Function(Float32List field0)? buffer,
     TResult? Function(DevInfo field0)? debugInfo,
+    TResult? Function(List<String> field0)? midiPorts,
   }) {
     return buffer?.call(field0);
   }
@@ -318,6 +332,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     TResult Function(BigInt field0)? position,
     TResult Function(Float32List field0)? buffer,
     TResult Function(DevInfo field0)? debugInfo,
+    TResult Function(List<String> field0)? midiPorts,
     required TResult orElse(),
   }) {
     if (buffer != null) {
@@ -332,6 +347,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     required TResult Function(PacketFromEngine_Position value) position,
     required TResult Function(PacketFromEngine_Buffer value) buffer,
     required TResult Function(PacketFromEngine_DebugInfo value) debugInfo,
+    required TResult Function(PacketFromEngine_MidiPorts value) midiPorts,
   }) {
     return buffer(this);
   }
@@ -342,6 +358,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     TResult? Function(PacketFromEngine_Position value)? position,
     TResult? Function(PacketFromEngine_Buffer value)? buffer,
     TResult? Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult? Function(PacketFromEngine_MidiPorts value)? midiPorts,
   }) {
     return buffer?.call(this);
   }
@@ -352,6 +369,7 @@ class _$PacketFromEngine_BufferImpl extends PacketFromEngine_Buffer {
     TResult Function(PacketFromEngine_Position value)? position,
     TResult Function(PacketFromEngine_Buffer value)? buffer,
     TResult Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult Function(PacketFromEngine_MidiPorts value)? midiPorts,
     required TResult orElse(),
   }) {
     if (buffer != null) {
@@ -444,6 +462,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     required TResult Function(BigInt field0) position,
     required TResult Function(Float32List field0) buffer,
     required TResult Function(DevInfo field0) debugInfo,
+    required TResult Function(List<String> field0) midiPorts,
   }) {
     return debugInfo(field0);
   }
@@ -454,6 +473,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     TResult? Function(BigInt field0)? position,
     TResult? Function(Float32List field0)? buffer,
     TResult? Function(DevInfo field0)? debugInfo,
+    TResult? Function(List<String> field0)? midiPorts,
   }) {
     return debugInfo?.call(field0);
   }
@@ -464,6 +484,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     TResult Function(BigInt field0)? position,
     TResult Function(Float32List field0)? buffer,
     TResult Function(DevInfo field0)? debugInfo,
+    TResult Function(List<String> field0)? midiPorts,
     required TResult orElse(),
   }) {
     if (debugInfo != null) {
@@ -478,6 +499,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     required TResult Function(PacketFromEngine_Position value) position,
     required TResult Function(PacketFromEngine_Buffer value) buffer,
     required TResult Function(PacketFromEngine_DebugInfo value) debugInfo,
+    required TResult Function(PacketFromEngine_MidiPorts value) midiPorts,
   }) {
     return debugInfo(this);
   }
@@ -488,6 +510,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     TResult? Function(PacketFromEngine_Position value)? position,
     TResult? Function(PacketFromEngine_Buffer value)? buffer,
     TResult? Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult? Function(PacketFromEngine_MidiPorts value)? midiPorts,
   }) {
     return debugInfo?.call(this);
   }
@@ -498,6 +521,7 @@ class _$PacketFromEngine_DebugInfoImpl extends PacketFromEngine_DebugInfo {
     TResult Function(PacketFromEngine_Position value)? position,
     TResult Function(PacketFromEngine_Buffer value)? buffer,
     TResult Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult Function(PacketFromEngine_MidiPorts value)? midiPorts,
     required TResult orElse(),
   }) {
     if (debugInfo != null) {
@@ -516,5 +540,165 @@ abstract class PacketFromEngine_DebugInfo extends PacketFromEngine {
   DevInfo get field0;
   @JsonKey(ignore: true)
   _$$PacketFromEngine_DebugInfoImplCopyWith<_$PacketFromEngine_DebugInfoImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$PacketFromEngine_MidiPortsImplCopyWith<$Res> {
+  factory _$$PacketFromEngine_MidiPortsImplCopyWith(
+          _$PacketFromEngine_MidiPortsImpl value,
+          $Res Function(_$PacketFromEngine_MidiPortsImpl) then) =
+      __$$PacketFromEngine_MidiPortsImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<String> field0});
+}
+
+/// @nodoc
+class __$$PacketFromEngine_MidiPortsImplCopyWithImpl<$Res>
+    extends _$PacketFromEngineCopyWithImpl<$Res,
+        _$PacketFromEngine_MidiPortsImpl>
+    implements _$$PacketFromEngine_MidiPortsImplCopyWith<$Res> {
+  __$$PacketFromEngine_MidiPortsImplCopyWithImpl(
+      _$PacketFromEngine_MidiPortsImpl _value,
+      $Res Function(_$PacketFromEngine_MidiPortsImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(_$PacketFromEngine_MidiPortsImpl(
+      null == field0
+          ? _value._field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$PacketFromEngine_MidiPortsImpl extends PacketFromEngine_MidiPorts {
+  const _$PacketFromEngine_MidiPortsImpl(final List<String> field0)
+      : _field0 = field0,
+        super._();
+
+  final List<String> _field0;
+  @override
+  List<String> get field0 {
+    if (_field0 is EqualUnmodifiableListView) return _field0;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_field0);
+  }
+
+  @override
+  String toString() {
+    return 'PacketFromEngine.midiPorts(field0: $field0)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PacketFromEngine_MidiPortsImpl &&
+            const DeepCollectionEquality().equals(other._field0, _field0));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_field0));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PacketFromEngine_MidiPortsImplCopyWith<_$PacketFromEngine_MidiPortsImpl>
+      get copyWith => __$$PacketFromEngine_MidiPortsImplCopyWithImpl<
+          _$PacketFromEngine_MidiPortsImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(BigInt field0) position,
+    required TResult Function(Float32List field0) buffer,
+    required TResult Function(DevInfo field0) debugInfo,
+    required TResult Function(List<String> field0) midiPorts,
+  }) {
+    return midiPorts(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(BigInt field0)? position,
+    TResult? Function(Float32List field0)? buffer,
+    TResult? Function(DevInfo field0)? debugInfo,
+    TResult? Function(List<String> field0)? midiPorts,
+  }) {
+    return midiPorts?.call(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(BigInt field0)? position,
+    TResult Function(Float32List field0)? buffer,
+    TResult Function(DevInfo field0)? debugInfo,
+    TResult Function(List<String> field0)? midiPorts,
+    required TResult orElse(),
+  }) {
+    if (midiPorts != null) {
+      return midiPorts(field0);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(PacketFromEngine_Position value) position,
+    required TResult Function(PacketFromEngine_Buffer value) buffer,
+    required TResult Function(PacketFromEngine_DebugInfo value) debugInfo,
+    required TResult Function(PacketFromEngine_MidiPorts value) midiPorts,
+  }) {
+    return midiPorts(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(PacketFromEngine_Position value)? position,
+    TResult? Function(PacketFromEngine_Buffer value)? buffer,
+    TResult? Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult? Function(PacketFromEngine_MidiPorts value)? midiPorts,
+  }) {
+    return midiPorts?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(PacketFromEngine_Position value)? position,
+    TResult Function(PacketFromEngine_Buffer value)? buffer,
+    TResult Function(PacketFromEngine_DebugInfo value)? debugInfo,
+    TResult Function(PacketFromEngine_MidiPorts value)? midiPorts,
+    required TResult orElse(),
+  }) {
+    if (midiPorts != null) {
+      return midiPorts(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class PacketFromEngine_MidiPorts extends PacketFromEngine {
+  const factory PacketFromEngine_MidiPorts(final List<String> field0) =
+      _$PacketFromEngine_MidiPortsImpl;
+  const PacketFromEngine_MidiPorts._() : super._();
+
+  @override
+  List<String> get field0;
+  @JsonKey(ignore: true)
+  _$$PacketFromEngine_MidiPortsImplCopyWith<_$PacketFromEngine_MidiPortsImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

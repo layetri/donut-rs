@@ -1248,7 +1248,6 @@ dependencies = [
  "bincode",
  "cc",
  "chrono",
- "coreaudio-sys",
  "cpal",
  "flutter_rust_bridge",
  "homedir",

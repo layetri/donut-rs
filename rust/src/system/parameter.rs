@@ -128,7 +128,7 @@ impl Parameter {
             ParameterID::WT1Amount => Self::new(id, module_id, Some(voice_id), 0.5, 0.5, (0.0, 1.0)),
             ParameterID::WS1Amount => Self::new(id, module_id, Some(voice_id), 0.0, 0.0, (0.0, 1.0)),
             ParameterID::KSAmount => Self::new(id, module_id, Some(voice_id), 0.5, 0.5, (0.0, 1.0)),
-            ParameterID::FXSaturatorAmount => Self::new(id, module_id, Some(voice_id), 0.5, 0.5, (0.0, 1.0)),
+            
 
             _ => panic!("no parameter with that id")
         }
@@ -137,6 +137,7 @@ impl Parameter {
     pub fn global_from_id(id: ParameterID, module_id: Uuid, sample_rate: f32) -> Self {
         match id {
             ParameterID::FXSaturatorAlpha => Self::new(id, module_id, None, 0.5, 0.5, (0.0, 1.0)),
+            ParameterID::FXSaturatorAmount => Self::new(id, module_id, None, 0.5, 0.5, (0.0, 1.0)),
 
             _ => panic!("no global parameter with that ID")
         }

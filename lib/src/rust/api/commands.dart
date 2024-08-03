@@ -24,6 +24,9 @@ sealed class PacketFromEngine with _$PacketFromEngine {
   const factory PacketFromEngine.debugInfo(
     DevInfo field0,
   ) = PacketFromEngine_DebugInfo;
+  const factory PacketFromEngine.midiPorts(
+    List<String> field0,
+  ) = PacketFromEngine_MidiPorts;
 
   Future<String> getContent() =>
       RustLib.instance.api.crateApiCommandsPacketFromEngineGetContent(

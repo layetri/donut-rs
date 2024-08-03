@@ -35,7 +35,7 @@ impl SampleLibraryHeader {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Sample {
     #[serde(skip)]
     pub buffer: Buffer,
@@ -75,17 +75,17 @@ impl Sample {
     }
 
     fn analysis(&mut self, sample_rate: f32) {
-        // let opt = rsworld_sys::HarvestOption {
-        //     f0_floor: 80.0,
-        //     f0_ceil: 4000.0,
-        //     frame_period: 5.0,
-        // };
+        let opt = rsworld_sys::HarvestOption {
+            f0_floor: 80.0,
+            f0_ceil: 4000.0,
+            frame_period: 5.0,
+        };
 
         // // Pitch
-        // let buff = self.buffer.as_vec().iter().map(|x| *x as f64).collect::<Vec<f64>>();
-        // let (t, f0) = rsworld::harvest(&buff, sample_rate as i32, &opt);
+        let buff = self.buffer.as_vec().iter().map(|x| *x as f64).collect::<Vec<f64>>();
+        let (t, f0) = rsworld::harvest(&buff, sample_rate as i32, &opt);
 
-        // let pitch = f0.iter().fold(0.0, |acc, x| acc + x) / f0.len() as f64;
+        let pitch = f0.iter().fold(0.0, |acc, x| acc + x) / f0.len() as f64;
 
         // MFCC
         // let mfcc =
@@ -95,7 +95,7 @@ impl Sample {
 
         // Centroid
 
-        // self.pitch = pitch as f32;
+        self.pitch = pitch as f32;
         // self.rms = rms;
     }
 }
@@ -170,6 +170,12 @@ impl SampleLibrary {
             self.samples.push(sample);
         }
     }
+    
+    pub fn get_active_for_pitch(&self, pitch: u8) -> Option<&Sample> {
+        
+        
+        None
+    }
 }
 
 #[cfg(test)]
@@ -178,8 +184,6 @@ mod tests {
 
     #[test]
     fn test_sample_library() {
-        // TODO: Figure out a WASM-compatible way of dealing with this
-        // let src_dir = PathBuf::from("/home/layetri/donut/samples");
         let src_dir = homedir::my_home().unwrap().unwrap().join("donut").join("samples");
         let mut lib = SampleLibrary::new(vec![src_dir]);
         lib.load_samples(44100.0);

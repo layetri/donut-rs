@@ -1,7 +1,9 @@
 // The original content is temporarily commented out to allow generating a self-contained demo - feel free to uncomment later.
 
+import 'package:donut/blocks/controls.dart';
 import 'package:donut/blocks/debug.dart';
 import 'package:donut/blocks/keyboard.dart';
+import 'package:donut/blocks/midi_select.dart';
 import 'package:donut/providers/dispatch.dart';
 import 'package:donut/providers/playback.dart';
 import 'package:flutter/material.dart';
@@ -31,36 +33,46 @@ class Donut extends ConsumerWidget {
       home: Scaffold(
         body: Column(
           children: [
-            Expanded(
-              child: Center(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 100,
-                      width: 300,
-                      child: Row(
-                        children: [
-                          Text("Bar: ${musicalTime.bar}"),
-                          const SizedBox(width: 20),
-                          Text("Beat: ${musicalTime.beat}"),
-                          const SizedBox(width: 20),
-                          Text("Tick: ${musicalTime.tick}"),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      child: const Text("Play"),
-                      onPressed: () {
-                        play();
-                      },
-                    ),
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  const Spacer(),
 
-                    const SizedBox(height: 40),
+                  const MidiDeviceSelector(),
 
-                    DebugInfoComponent()
-                  ],
-                )
+                  const Spacer(),
+
+                  SizedBox(
+                    height: 100,
+                    width: 300,
+                    child: Row(
+                      children: [
+                        Text("Bar: ${musicalTime.bar}"),
+                        const SizedBox(width: 20),
+                        Text("Beat: ${musicalTime.beat}"),
+                        const SizedBox(width: 20),
+                        Text("Tick: ${musicalTime.tick}"),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  TextButton(
+                    child: const Text("Play"),
+                    onPressed: () {
+                      play();
+                    },
+                  ),
+
+                  const Spacer()
+                ],
               ),
+            ),
+            const Expanded(
+              child: Controls()
             ),
 
             const Text("Donut", style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white)),

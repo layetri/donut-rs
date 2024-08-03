@@ -18,4 +18,7 @@ pub trait AudioEffect {
     
     fn get_parameters(&self) -> SmallVec<[&Parameter; 16]>;
     fn get_parameters_mut(&mut self) -> SmallVec<[&mut Parameter; 16]>;
+    
+    fn get_level(&self) -> &Parameter;
+    fn get_level_mut(&mut self) -> &mut Parameter;
 }

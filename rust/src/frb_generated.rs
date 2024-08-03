@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.1.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1037847905;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1106887740;
 
 // Section: executor
 
@@ -245,6 +245,71 @@ fn wire__crate__api__simple__play_impl(
         },
     )
 }
+fn wire__crate__api__simple__set_midi_input_port_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "set_midi_input_port",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Result::<_, ()>::Ok({
+                    crate::api::simple::set_midi_input_port(api_name);
+                })?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__crate__api__simple__set_parameter_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "set_parameter",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_id = <crate::system::parameter::ParameterID>::sse_decode(&mut deserializer);
+            let api_value = <f32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Result::<_, ()>::Ok({
+                    crate::api::simple::set_parameter(api_id, api_value);
+                })?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__ui__run_handler_thread_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -346,6 +411,25 @@ impl SseDecode for f32 {
     }
 }
 
+impl SseDecode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
+impl SseDecode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<String>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<f32> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -387,10 +471,93 @@ impl SseDecode for crate::api::commands::PacketFromEngine {
                 let mut var_field0 = <crate::system::dev::DevInfo>::sse_decode(deserializer);
                 return crate::api::commands::PacketFromEngine::DebugInfo(var_field0);
             }
+            3 => {
+                let mut var_field0 = <Vec<String>>::sse_decode(deserializer);
+                return crate::api::commands::PacketFromEngine::MidiPorts(var_field0);
+            }
             _ => {
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseDecode for crate::system::parameter::ParameterID {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::system::parameter::ParameterID::ADSR1Attack,
+            1 => crate::system::parameter::ParameterID::ADSR1Decay,
+            2 => crate::system::parameter::ParameterID::ADSR1Sustain,
+            3 => crate::system::parameter::ParameterID::ADSR1Release,
+            4 => crate::system::parameter::ParameterID::ADSR2Atttack,
+            5 => crate::system::parameter::ParameterID::ADSR2Decay,
+            6 => crate::system::parameter::ParameterID::ADSR2Sustain,
+            7 => crate::system::parameter::ParameterID::ADSR2Release,
+            8 => crate::system::parameter::ParameterID::FilterCutoff,
+            9 => crate::system::parameter::ParameterID::FilterResonance,
+            10 => crate::system::parameter::ParameterID::FilterType,
+            11 => crate::system::parameter::ParameterID::FilterKeytrack,
+            12 => crate::system::parameter::ParameterID::FMKeytrack,
+            13 => crate::system::parameter::ParameterID::FMAmount,
+            14 => crate::system::parameter::ParameterID::WT1Amount,
+            15 => crate::system::parameter::ParameterID::WT1Shape,
+            16 => crate::system::parameter::ParameterID::WT1Detune,
+            17 => crate::system::parameter::ParameterID::WT1BaseFrequency,
+            18 => crate::system::parameter::ParameterID::WT1Transpose,
+            19 => crate::system::parameter::ParameterID::WT2Amount,
+            20 => crate::system::parameter::ParameterID::WT2Shape,
+            21 => crate::system::parameter::ParameterID::WT2Detune,
+            22 => crate::system::parameter::ParameterID::WT2BaseFrequency,
+            23 => crate::system::parameter::ParameterID::WT2Transpose,
+            24 => crate::system::parameter::ParameterID::WS1Amount,
+            25 => crate::system::parameter::ParameterID::WS1BaseFrequency,
+            26 => crate::system::parameter::ParameterID::WS1Harmonics,
+            27 => crate::system::parameter::ParameterID::WS1Detune,
+            28 => crate::system::parameter::ParameterID::WS1DetuneRANGE,
+            29 => crate::system::parameter::ParameterID::WS1Transpose,
+            30 => crate::system::parameter::ParameterID::WS2Amount,
+            31 => crate::system::parameter::ParameterID::WS2BaseFrequency,
+            32 => crate::system::parameter::ParameterID::WS2Harmonics,
+            33 => crate::system::parameter::ParameterID::WS2Detune,
+            34 => crate::system::parameter::ParameterID::WS2DetuneRANGE,
+            35 => crate::system::parameter::ParameterID::WS2Transpose,
+            36 => crate::system::parameter::ParameterID::KSAmount,
+            37 => crate::system::parameter::ParameterID::KSDelay,
+            38 => crate::system::parameter::ParameterID::KSFeedback,
+            39 => crate::system::parameter::ParameterID::KSCutoff,
+            40 => crate::system::parameter::ParameterID::SAMPLERAmount,
+            41 => crate::system::parameter::ParameterID::SAMPLERTranspose,
+            42 => crate::system::parameter::ParameterID::SAMPLERBase,
+            43 => crate::system::parameter::ParameterID::PARTICLESAmount,
+            44 => crate::system::parameter::ParameterID::PARTICLESDensity,
+            45 => crate::system::parameter::ParameterID::PARTICLESShape,
+            46 => crate::system::parameter::ParameterID::PARTICLESAlgorithm,
+            47 => crate::system::parameter::ParameterID::PARTICLESGrainSize,
+            48 => crate::system::parameter::ParameterID::PARTICLESPosition,
+            49 => crate::system::parameter::ParameterID::LFO1Rate,
+            50 => crate::system::parameter::ParameterID::LFO1Sync,
+            51 => crate::system::parameter::ParameterID::LFO2Rate,
+            52 => crate::system::parameter::ParameterID::LFO2Sync,
+            53 => crate::system::parameter::ParameterID::RND1Rate,
+            54 => crate::system::parameter::ParameterID::RND1Range,
+            55 => crate::system::parameter::ParameterID::RND1Sync,
+            56 => crate::system::parameter::ParameterID::RND1Slew,
+            57 => crate::system::parameter::ParameterID::FXDelayAmount,
+            58 => crate::system::parameter::ParameterID::FXDelayTimeLeft,
+            59 => crate::system::parameter::ParameterID::FXDelayTimeRight,
+            60 => crate::system::parameter::ParameterID::FXDelayFeedbackLeft,
+            61 => crate::system::parameter::ParameterID::FXDelayFeedbackRight,
+            62 => crate::system::parameter::ParameterID::FXSaturatorAmount,
+            63 => crate::system::parameter::ParameterID::FXSaturatorAlpha,
+            64 => crate::system::parameter::ParameterID::FXFoldAmount,
+            65 => crate::system::parameter::ParameterID::FXFoldGain,
+            66 => crate::system::parameter::ParameterID::OUTPUTHpfCutoff,
+            67 => crate::system::parameter::ParameterID::VOICEMaster,
+            68 => crate::system::parameter::ParameterID::INSTRUMENTMaster,
+            _ => unreachable!("Invalid variant for ParameterID: {}", inner),
+        };
     }
 }
 
@@ -425,13 +592,6 @@ impl SseDecode for usize {
     }
 }
 
-impl SseDecode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
-    }
-}
-
 fn pde_ffi_dispatcher_primary_impl(
     func_id: i32,
     port: flutter_rust_bridge::for_generated::MessagePort,
@@ -454,7 +614,7 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         3 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__ui__run_handler_thread_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__ui__run_handler_thread_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -470,6 +630,8 @@ fn pde_ffi_dispatcher_sync_impl(
         4 => wire__crate__api__simple__note_off_impl(ptr, rust_vec_len, data_len),
         5 => wire__crate__api__simple__note_on_impl(ptr, rust_vec_len, data_len),
         6 => wire__crate__api__simple__play_impl(ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__simple__set_midi_input_port_impl(ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__simple__set_parameter_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -511,6 +673,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::commands::PacketFromEngine {
             crate::api::commands::PacketFromEngine::DebugInfo(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
+            crate::api::commands::PacketFromEngine::MidiPorts(field0) => {
+                [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
             _ => {
                 unimplemented!("");
             }
@@ -525,6 +690,94 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::commands::PacketFromEngine>
     for crate::api::commands::PacketFromEngine
 {
     fn into_into_dart(self) -> crate::api::commands::PacketFromEngine {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::system::parameter::ParameterID {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::ADSR1Attack => 0.into_dart(),
+            Self::ADSR1Decay => 1.into_dart(),
+            Self::ADSR1Sustain => 2.into_dart(),
+            Self::ADSR1Release => 3.into_dart(),
+            Self::ADSR2Atttack => 4.into_dart(),
+            Self::ADSR2Decay => 5.into_dart(),
+            Self::ADSR2Sustain => 6.into_dart(),
+            Self::ADSR2Release => 7.into_dart(),
+            Self::FilterCutoff => 8.into_dart(),
+            Self::FilterResonance => 9.into_dart(),
+            Self::FilterType => 10.into_dart(),
+            Self::FilterKeytrack => 11.into_dart(),
+            Self::FMKeytrack => 12.into_dart(),
+            Self::FMAmount => 13.into_dart(),
+            Self::WT1Amount => 14.into_dart(),
+            Self::WT1Shape => 15.into_dart(),
+            Self::WT1Detune => 16.into_dart(),
+            Self::WT1BaseFrequency => 17.into_dart(),
+            Self::WT1Transpose => 18.into_dart(),
+            Self::WT2Amount => 19.into_dart(),
+            Self::WT2Shape => 20.into_dart(),
+            Self::WT2Detune => 21.into_dart(),
+            Self::WT2BaseFrequency => 22.into_dart(),
+            Self::WT2Transpose => 23.into_dart(),
+            Self::WS1Amount => 24.into_dart(),
+            Self::WS1BaseFrequency => 25.into_dart(),
+            Self::WS1Harmonics => 26.into_dart(),
+            Self::WS1Detune => 27.into_dart(),
+            Self::WS1DetuneRANGE => 28.into_dart(),
+            Self::WS1Transpose => 29.into_dart(),
+            Self::WS2Amount => 30.into_dart(),
+            Self::WS2BaseFrequency => 31.into_dart(),
+            Self::WS2Harmonics => 32.into_dart(),
+            Self::WS2Detune => 33.into_dart(),
+            Self::WS2DetuneRANGE => 34.into_dart(),
+            Self::WS2Transpose => 35.into_dart(),
+            Self::KSAmount => 36.into_dart(),
+            Self::KSDelay => 37.into_dart(),
+            Self::KSFeedback => 38.into_dart(),
+            Self::KSCutoff => 39.into_dart(),
+            Self::SAMPLERAmount => 40.into_dart(),
+            Self::SAMPLERTranspose => 41.into_dart(),
+            Self::SAMPLERBase => 42.into_dart(),
+            Self::PARTICLESAmount => 43.into_dart(),
+            Self::PARTICLESDensity => 44.into_dart(),
+            Self::PARTICLESShape => 45.into_dart(),
+            Self::PARTICLESAlgorithm => 46.into_dart(),
+            Self::PARTICLESGrainSize => 47.into_dart(),
+            Self::PARTICLESPosition => 48.into_dart(),
+            Self::LFO1Rate => 49.into_dart(),
+            Self::LFO1Sync => 50.into_dart(),
+            Self::LFO2Rate => 51.into_dart(),
+            Self::LFO2Sync => 52.into_dart(),
+            Self::RND1Rate => 53.into_dart(),
+            Self::RND1Range => 54.into_dart(),
+            Self::RND1Sync => 55.into_dart(),
+            Self::RND1Slew => 56.into_dart(),
+            Self::FXDelayAmount => 57.into_dart(),
+            Self::FXDelayTimeLeft => 58.into_dart(),
+            Self::FXDelayTimeRight => 59.into_dart(),
+            Self::FXDelayFeedbackLeft => 60.into_dart(),
+            Self::FXDelayFeedbackRight => 61.into_dart(),
+            Self::FXSaturatorAmount => 62.into_dart(),
+            Self::FXSaturatorAlpha => 63.into_dart(),
+            Self::FXFoldAmount => 64.into_dart(),
+            Self::FXFoldGain => 65.into_dart(),
+            Self::OUTPUTHpfCutoff => 66.into_dart(),
+            Self::VOICEMaster => 67.into_dart(),
+            Self::INSTRUMENTMaster => 68.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::system::parameter::ParameterID
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::system::parameter::ParameterID>
+    for crate::system::parameter::ParameterID
+{
+    fn into_into_dart(self) -> crate::system::parameter::ParameterID {
         self
     }
 }
@@ -599,6 +852,23 @@ impl SseEncode for f32 {
     }
 }
 
+impl SseEncode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
+impl SseEncode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <String>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<f32> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -635,10 +905,97 @@ impl SseEncode for crate::api::commands::PacketFromEngine {
                 <i32>::sse_encode(2, serializer);
                 <crate::system::dev::DevInfo>::sse_encode(field0, serializer);
             }
+            crate::api::commands::PacketFromEngine::MidiPorts(field0) => {
+                <i32>::sse_encode(3, serializer);
+                <Vec<String>>::sse_encode(field0, serializer);
+            }
             _ => {
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseEncode for crate::system::parameter::ParameterID {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::system::parameter::ParameterID::ADSR1Attack => 0,
+                crate::system::parameter::ParameterID::ADSR1Decay => 1,
+                crate::system::parameter::ParameterID::ADSR1Sustain => 2,
+                crate::system::parameter::ParameterID::ADSR1Release => 3,
+                crate::system::parameter::ParameterID::ADSR2Atttack => 4,
+                crate::system::parameter::ParameterID::ADSR2Decay => 5,
+                crate::system::parameter::ParameterID::ADSR2Sustain => 6,
+                crate::system::parameter::ParameterID::ADSR2Release => 7,
+                crate::system::parameter::ParameterID::FilterCutoff => 8,
+                crate::system::parameter::ParameterID::FilterResonance => 9,
+                crate::system::parameter::ParameterID::FilterType => 10,
+                crate::system::parameter::ParameterID::FilterKeytrack => 11,
+                crate::system::parameter::ParameterID::FMKeytrack => 12,
+                crate::system::parameter::ParameterID::FMAmount => 13,
+                crate::system::parameter::ParameterID::WT1Amount => 14,
+                crate::system::parameter::ParameterID::WT1Shape => 15,
+                crate::system::parameter::ParameterID::WT1Detune => 16,
+                crate::system::parameter::ParameterID::WT1BaseFrequency => 17,
+                crate::system::parameter::ParameterID::WT1Transpose => 18,
+                crate::system::parameter::ParameterID::WT2Amount => 19,
+                crate::system::parameter::ParameterID::WT2Shape => 20,
+                crate::system::parameter::ParameterID::WT2Detune => 21,
+                crate::system::parameter::ParameterID::WT2BaseFrequency => 22,
+                crate::system::parameter::ParameterID::WT2Transpose => 23,
+                crate::system::parameter::ParameterID::WS1Amount => 24,
+                crate::system::parameter::ParameterID::WS1BaseFrequency => 25,
+                crate::system::parameter::ParameterID::WS1Harmonics => 26,
+                crate::system::parameter::ParameterID::WS1Detune => 27,
+                crate::system::parameter::ParameterID::WS1DetuneRANGE => 28,
+                crate::system::parameter::ParameterID::WS1Transpose => 29,
+                crate::system::parameter::ParameterID::WS2Amount => 30,
+                crate::system::parameter::ParameterID::WS2BaseFrequency => 31,
+                crate::system::parameter::ParameterID::WS2Harmonics => 32,
+                crate::system::parameter::ParameterID::WS2Detune => 33,
+                crate::system::parameter::ParameterID::WS2DetuneRANGE => 34,
+                crate::system::parameter::ParameterID::WS2Transpose => 35,
+                crate::system::parameter::ParameterID::KSAmount => 36,
+                crate::system::parameter::ParameterID::KSDelay => 37,
+                crate::system::parameter::ParameterID::KSFeedback => 38,
+                crate::system::parameter::ParameterID::KSCutoff => 39,
+                crate::system::parameter::ParameterID::SAMPLERAmount => 40,
+                crate::system::parameter::ParameterID::SAMPLERTranspose => 41,
+                crate::system::parameter::ParameterID::SAMPLERBase => 42,
+                crate::system::parameter::ParameterID::PARTICLESAmount => 43,
+                crate::system::parameter::ParameterID::PARTICLESDensity => 44,
+                crate::system::parameter::ParameterID::PARTICLESShape => 45,
+                crate::system::parameter::ParameterID::PARTICLESAlgorithm => 46,
+                crate::system::parameter::ParameterID::PARTICLESGrainSize => 47,
+                crate::system::parameter::ParameterID::PARTICLESPosition => 48,
+                crate::system::parameter::ParameterID::LFO1Rate => 49,
+                crate::system::parameter::ParameterID::LFO1Sync => 50,
+                crate::system::parameter::ParameterID::LFO2Rate => 51,
+                crate::system::parameter::ParameterID::LFO2Sync => 52,
+                crate::system::parameter::ParameterID::RND1Rate => 53,
+                crate::system::parameter::ParameterID::RND1Range => 54,
+                crate::system::parameter::ParameterID::RND1Sync => 55,
+                crate::system::parameter::ParameterID::RND1Slew => 56,
+                crate::system::parameter::ParameterID::FXDelayAmount => 57,
+                crate::system::parameter::ParameterID::FXDelayTimeLeft => 58,
+                crate::system::parameter::ParameterID::FXDelayTimeRight => 59,
+                crate::system::parameter::ParameterID::FXDelayFeedbackLeft => 60,
+                crate::system::parameter::ParameterID::FXDelayFeedbackRight => 61,
+                crate::system::parameter::ParameterID::FXSaturatorAmount => 62,
+                crate::system::parameter::ParameterID::FXSaturatorAlpha => 63,
+                crate::system::parameter::ParameterID::FXFoldAmount => 64,
+                crate::system::parameter::ParameterID::FXFoldGain => 65,
+                crate::system::parameter::ParameterID::OUTPUTHpfCutoff => 66,
+                crate::system::parameter::ParameterID::VOICEMaster => 67,
+                crate::system::parameter::ParameterID::INSTRUMENTMaster => 68,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -669,13 +1026,6 @@ impl SseEncode for usize {
             .cursor
             .write_u64::<NativeEndian>(self as _)
             .unwrap();
-    }
-}
-
-impl SseEncode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
     }
 }
 

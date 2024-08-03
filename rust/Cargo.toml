@@ -31,7 +31,7 @@ rubato = "0.15.0"
 rsworld-sys = "0.1.0"
 tqdm = "0.7.0"
 lazy_static = "1.5.0"
-coreaudio-sys = "0.2.15"
+#coreaudio-sys = "0.2.15"
 # serde-wasm-bindgen = "0.6.5"
 # getrandom = {version = "0.2.15", features = ["js"]}
 cc = "1.0.103"

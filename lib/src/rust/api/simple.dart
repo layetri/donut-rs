@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../system/parameter.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 void play() => RustLib.instance.api.crateApiSimplePlay();
@@ -13,3 +14,9 @@ void noteOn({required int pitch, required double velocity}) =>
 
 void noteOff({required int pitch}) =>
     RustLib.instance.api.crateApiSimpleNoteOff(pitch: pitch);
+
+void setMidiInputPort({required String name}) =>
+    RustLib.instance.api.crateApiSimpleSetMidiInputPort(name: name);
+
+void setParameter({required ParameterID id, required double value}) =>
+    RustLib.instance.api.crateApiSimpleSetParameter(id: id, value: value);

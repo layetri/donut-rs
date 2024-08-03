@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 import 'system/dev.dart';
+import 'system/parameter.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLibApiImplPlatform({
@@ -55,6 +56,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double dco_decode_f_32(dynamic raw);
 
   @protected
+  int dco_decode_i_32(dynamic raw);
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
   Float32List dco_decode_list_prim_f_32_strict(dynamic raw);
 
   @protected
@@ -62,6 +69,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PacketFromEngine dco_decode_packet_from_engine(dynamic raw);
+
+  @protected
+  ParameterID dco_decode_parameter_id(dynamic raw);
 
   @protected
   StreamSinkPacket dco_decode_stream_sink_packet(dynamic raw);
@@ -106,6 +116,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_32(SseDeserializer deserializer);
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
   Float32List sse_decode_list_prim_f_32_strict(SseDeserializer deserializer);
 
   @protected
@@ -113,6 +129,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PacketFromEngine sse_decode_packet_from_engine(SseDeserializer deserializer);
+
+  @protected
+  ParameterID sse_decode_parameter_id(SseDeserializer deserializer);
 
   @protected
   StreamSinkPacket sse_decode_stream_sink_packet(SseDeserializer deserializer);
@@ -125,9 +144,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
-
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -161,6 +177,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_32(double self, SseSerializer serializer);
 
   @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_f_32_strict(
       Float32List self, SseSerializer serializer);
 
@@ -171,6 +193,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_packet_from_engine(
       PacketFromEngine self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_parameter_id(ParameterID self, SseSerializer serializer);
 
   @protected
   void sse_encode_stream_sink_packet(
@@ -184,9 +209,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
 }
 
 // Section: wire_class
