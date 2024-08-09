@@ -23,6 +23,10 @@ class MidiDeviceProvider extends StateNotifier<MidiDeviceState> {
         ..devices = ports
         ..selected = ports.isEmpty ? "" : ports.first;
     });
+    
+    state.devices = getMidiDevices();
+    
+    print("MidiDeviceProvider: ${state.devices} (${getMidiDevices()}");
   }
 
   void addDevice(String device) {

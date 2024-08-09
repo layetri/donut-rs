@@ -6,8 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These types are ignored because they are not used by any `pub` functions: `ALREADY_LOADED`, `SENDER`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `deref`, `deref`, `fmt`, `initialize`, `initialize`
+// These types are ignored because they are not used by any `pub` functions: `ALREADY_LOADED`, `SENDER`, `STATE`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `deref`, `deref`, `deref`, `fmt`, `initialize`, `initialize`, `initialize`
 // These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `send_message`
 
 Stream<StreamSinkPacket> runHandlerThread() =>
@@ -15,6 +15,28 @@ Stream<StreamSinkPacket> runHandlerThread() =>
 
 abstract class GuiSender {
   Future<void> sendMessage({required StreamSinkPacket message});
+}
+
+class ApplicationState {
+  final List<String> midiDevices;
+
+  const ApplicationState({
+    required this.midiDevices,
+  });
+
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<ApplicationState> newInstance() =>
+      RustLib.instance.api.crateApiUiApplicationStateNew();
+
+  @override
+  int get hashCode => midiDevices.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApplicationState &&
+          runtimeType == other.runtimeType &&
+          midiDevices == other.midiDevices;
 }
 
 class StreamSinkPacket {

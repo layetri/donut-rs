@@ -33,7 +33,7 @@ sealed class PacketFromEngine with _$PacketFromEngine {
         that: this,
       );
 
-  Future<String> getDestination() =>
+  Future<void> getDestination() =>
       RustLib.instance.api.crateApiCommandsPacketFromEngineGetDestination(
         that: this,
       );

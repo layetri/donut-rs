@@ -2,7 +2,7 @@ use std::env;
 use crate::system::parameter::ParameterID;
 
 use super::commands::PacketFromUI;
-use super::ui::SENDER;
+use super::ui::{SENDER, STATE};
 
 pub use super::ui::run_handler_thread;
 
@@ -39,6 +39,11 @@ pub fn set_midi_input_port(name: String) {
 pub fn set_parameter(id: ParameterID, value: f32) {
     let message = PacketFromUI::SetParameter(id, value);
     SENDER.lock().unwrap().as_ref().unwrap().send(message).unwrap();
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn get_midi_devices() -> Vec<String> {
+    STATE.lock().unwrap().midi_devices.clone()
 }
 
 #[flutter_rust_bridge::frb(init)]

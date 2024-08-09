@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use smallvec::{SmallVec, smallvec};
 use uuid::Uuid;
 use crate::dsp::buffer::Buffer;
-use crate::dsp::util::mtof_detune;
+use crate::dsp::util::{mtof, mtof_detune};
 use crate::sources::AudioSource;
 use crate::system::parameter::{Parameter, ParameterID};
 use crate::system::parameter::ParameterID::{WT1Amount, WT1Detune, WT1Shape, WT1Transpose};
@@ -157,7 +157,9 @@ impl AudioSource for WaveTable {
     }
 
     fn set_pitch(&mut self, midi_note: u8) {
-        self.frequency = (self.sample_rate / TABLE_FREQUENCY) / mtof_detune(127.0-(midi_note as f32 + 2.0 + self.transpose.get_value()), self.detune.get_value());
+        // self.frequency = (self.sample_rate / TABLE_FREQUENCY) / mtof_detune(127.0-(midi_note as f32 + 2.0 + self.transpose.get_value()), self.detune.get_value());
+        
+        self.frequency = (self.sample_rate / TABLE_FREQUENCY) / mtof(127.0 - (midi_note as f32 + 2.0 + self.transpose.get_value()));
     }
 
     fn set_frequency(&mut self, frequency: f32) {

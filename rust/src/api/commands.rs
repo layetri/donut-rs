@@ -21,12 +21,12 @@ pub enum PacketFromEngine {
 }
 
 impl PacketFromEngine {
-    pub fn get_destination(&self) -> String {
+    pub fn get_destination(&self) -> &str {
         match self {
-            Self::Position(..) => String::from("engine.position"),
-            Self::Buffer(..) => String::from("engine.buffer"),
-            Self::DebugInfo(..) => String::from("debug"),
-            Self::MidiPorts(..) => String::from("midi.ports")
+            Self::Position(..) => "engine.position",
+            Self::Buffer(..) => "engine.buffer",
+            Self::DebugInfo(..) => "debug",
+            Self::MidiPorts(..) => "midi.ports"
         }
     }
 

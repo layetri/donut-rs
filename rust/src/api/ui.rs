@@ -30,9 +30,23 @@ impl GuiSender for StreamSink<StreamSinkPacket> {
     }
 }
 
+pub struct ApplicationState {
+    pub midi_devices: Vec<String>,
+}
+impl ApplicationState {
+    pub fn new() -> Self {
+        ApplicationState {
+            midi_devices: vec![],
+        }
+    }
+}
+
+
 lazy_static! {
     pub static ref SENDER: Mutex<Option<Sender<PacketFromUI>>> = Default::default();
     static ref ALREADY_LOADED: Mutex<bool> = Mutex::new(false);
+    
+    pub static ref STATE: Mutex<ApplicationState> = Mutex::new(ApplicationState::new());
 }
 
 
@@ -73,8 +87,17 @@ pub fn run_handler_thread(sink: StreamSink<StreamSinkPacket>) {
             let messages = engine.run();
 
             for message in messages {
+                match message.get_destination() {
+                    "midi.ports" => {
+                        let ports = message.get_content();
+                        let mut state = STATE.lock().unwrap();
+                        state.midi_devices = serde_json::from_str(&ports).unwrap();
+                    }
+                    _ => {}
+                }
+                
                 let res = sink.add(StreamSinkPacket {
-                    destination: message.get_destination(),
+                    destination: String::from(message.get_destination()),
                     content: message.get_content()
                 });
 

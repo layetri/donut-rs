@@ -20,3 +20,6 @@ void setMidiInputPort({required String name}) =>
 
 void setParameter({required ParameterID id, required double value}) =>
     RustLib.instance.api.crateApiSimpleSetParameter(id: id, value: value);
+
+List<String> getMidiDevices() =>
+    RustLib.instance.api.crateApiSimpleGetMidiDevices();
